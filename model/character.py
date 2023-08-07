@@ -13,6 +13,21 @@ class Character(ABC):
         self._ran = ran
         self._dp = dp
         self._frames = frames
-        self._pos = pos
-        self._dim = dim
+        self.pos = pos
+        self.dim = dim
 
+        def update_hp(self, hp_delta: int) -> None:
+            """Updates the hp of the character.
+
+            Args:
+                hp_delta (int): The change in hp.
+            """
+            self.set_hp(self._hp + hp_delta)
+
+        def set_hp(self, hp_val: int) -> None:
+            """Sets the characters hp attribute.
+
+            Args:
+                hp_val (int): The new hp value.
+            """
+            self._hp = hp_val
