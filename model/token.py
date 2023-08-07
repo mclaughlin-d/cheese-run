@@ -7,11 +7,9 @@ class Token(Element):
     Args:
         Element (Element): The parent class.
     """
-    def __init__(self, pos: tuple, dim: tuple, imgpath: str, bonus: int) -> None:
+    def __init__(self, pos: tuple, dim: tuple, imgpath: str, bonus: int = 1) -> None:
         super().__init__(pos, dim, imgpath)
         self._bonus = bonus
 
         def interact(self, char: Character):
-            # NOTE - will need to interact with player specifically to add points
-            # or perhaps will call a player method to determine interaction
-            return
+            char.incr_tokens(self._bonus)
