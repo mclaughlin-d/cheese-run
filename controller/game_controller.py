@@ -1,4 +1,4 @@
-from model.board import Board
+from controller.board_controller import BoardController
 import tkinter as tk
 
 import time
@@ -7,30 +7,34 @@ class GameController():
     """Controls gameplay.
     """
 
-    REFRESH_RATE = 0.005 # constant that controlls time interval between display updates
+    REFRESH_INTERVAL = 0.005 # constant that controlls time interval between display updates
 
     def __init__(self):
-        # create window:
+        # create window: SHOULD THSI BE IN DISPLAY INSTEAD?
         self._win = tk.Tk()
         self._win.bind('<KeyPress>', self.handle_keypress) #bind keypress to window
+
+        self._board_control = BoardController()
+
+        self._playing = True
+        self._last_refresh = None #initialize when game first created
        
 
-    def create_starting_elements(self):
+    def create_starting_elements(self) -> None:
         pass
 
-    def handle_keypress(self, key):
+    def handle_keypress(self, key) -> None:
+        self._board_control.handle_keypress(key)
 
-        # NOTE - alt is to bind all of these events to window with corresponding lambda functions
-        if key == "<Left>":
-            pass
-        elif key == "<Right>":
-            pass
-        elif key == "<Up>":
-            pass
-        elif key == "<Down>":
-            pass
-        elif key == "<Space>": # guessing on this name here
-            pass
+    def run_game(self) -> None:
 
-    def run_game(self):
+        while self._playing:
+            # do game stuff
+
+            # refresh the view every GameController.REFRESH_INTERVAL
+            if time.time() - self._last_refresh >= GameController.REFRESH_INTERVAL:
+                self._board_control.update_posns()
+                # AND UPDATE IN VIEW AS WELL!!!
+                self._last_refresh = time.time()
+
         pass   
