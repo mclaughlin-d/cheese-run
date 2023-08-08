@@ -1,12 +1,25 @@
 from model.element import Element
+from character import Character
 
 class Obstacle(Element):
-    """_summary_
+    """Represents an obstacle that hinders the player.
 
     Args:
-        Element (_type_): _description_
+        Element (Element): The parent class.
     """
-    def __init__(self, pos: tuple, dim: tuple) -> None:
-        super().__init__(pos, dim)
+    def __init__(self, pos: tuple, dim: tuple, imgpath: str, vel: tuple, block: bool, damage: int = 0) -> None:
+        super().__init__(pos, dim, imgpath, vel)
+        self._block = block
+        self._damage = damage
 
+        def interact(self, char: Character):
+            """Modifies the hp of the character.
+
+            Args:
+                char (Character): The character to modify.
+            """
+            if self._block:
+                char.set_hp(0)
+            else:
+                char.update_hp(self._damage * -1)
         

@@ -1,10 +1,15 @@
 from model.element import Element
+from model.character import Character
 
 class Token(Element):
-    """_summary_
+    """Represents a token the player can collect.
 
     Args:
-        Element (_type_): _description_
+        Element (Element): The parent class.
     """
-    def __init__(self, pos: tuple, dim: tuple) -> None:
-        super().__init__(pos, dim)
+    def __init__(self, pos: tuple, dim: tuple, imgpath: str, vel: tuple, bonus: int = 1) -> None:
+        super().__init__(pos, dim, imgpath, vel)
+        self._bonus = bonus
+
+        def interact(self, char: Character):
+            char.incr_tokens(self._bonus)
