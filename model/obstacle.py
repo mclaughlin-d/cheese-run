@@ -7,8 +7,8 @@ class Obstacle(Element):
     Args:
         Element (Element): The parent class.
     """
-    def __init__(self, pos: tuple, dim: tuple, imgpath: str, vel: tuple, block: bool, damage: int = 0) -> None:
-        super().__init__(pos, dim, imgpath, vel)
+    def __init__(self, pos: tuple, dim: tuple, imgpath: str, block: bool, damage: int = 0) -> None:
+        super().__init__(pos, dim, imgpath)
         self._block = block
         self._damage = damage
 

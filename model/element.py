@@ -7,37 +7,50 @@ class Element(ABC):
     Args:
         ABC (ABC): The abstract base class.
     """
-    def __init__(self, posn: tuple, dim: tuple, imgpath: str, vel: tuple) -> None:
+    def __init__(self, posn: tuple, dim: tuple, imgpath: str) -> None:
         self._posn = posn
         self._dim = dim
         self._imgpath = imgpath
-        self._vel = vel
+        self._vel = (0,0)
 
         @abstractmethod
         def interact(self):
             pass
 
-        def was_hit(self, char: Character):
+        def is_below(self, char: Character) -> bool:
+            """Determines whether the obstacle is below the character.
+
+            Args:
+                char (Character): The character being tested.
+
+            Returns:
+                bool: Whether the obstacle is below the character.
+            """
+            return(
+                (self._posn[0] <= char.pos[0] + char.dim[0] <= self._posn[0] + self._dim[0]) and
+                (self._posn[1] < char.pos[1] + char.dim[1])
+            )
+
+        def was_hit(self, char: Character) -> bool:
             """Determines if a character has interacted with the game element.
 
             Args:
-                c_pos (tuple): The character's position coordinate (top left of character)
-                c_dim (tuple): The character's dimensions (length and width)
+                char (Character): The character being tested. 
 
             Returns:
-                Bool: Whether or not the character 'hit' the element. 
+                bool: Whether or not the character 'hit' the element. 
             """
             return (
-                (self._pos[0] <= char.pos[0] + char.dim[0] <= self._pos[0] + self._dim[0]) and
-                (self.pos[1] <= char.pos[1] + char.dim[1] <= self._pos[1] + self._dim[1])
+                (self._posn[0] <= char.pos[0] + char.dim[0] <= self._posn[0] + self._dim[0]) and
+                (self._posn[1] <= char.pos[1] + char.dim[1] <= self._posn[1] + self._dim[1])
             )
         
-        def update_posn(self):
+        def update_posn(self) -> None:
             """Updates the elements position based on its velocity.
             """
-            self._pos = self._pos[0] + self._vel[0], self._pos[1] + self._vel[1]
+            self._posn = self._posn[0] + self._vel[0], self._posn[1] + self._vel[1]
 
-        def set_vel(self, x_vel: int, y_vel: int):
+        def set_vel(self, x_vel: int, y_vel: int) -> None:
             """Sets the velocity attribute based on the parameters passed.
 
             Args:

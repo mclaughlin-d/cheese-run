@@ -7,8 +7,8 @@ class Token(Element):
     Args:
         Element (Element): The parent class.
     """
-    def __init__(self, pos: tuple, dim: tuple, imgpath: str, vel: tuple, bonus: int = 1) -> None:
-        super().__init__(pos, dim, imgpath, vel)
+    def __init__(self, pos: tuple, dim: tuple, imgpath: str, bonus: int = 1) -> None:
+        super().__init__(pos, dim, imgpath)
         self._bonus = bonus
 
         def interact(self, char: Character):
