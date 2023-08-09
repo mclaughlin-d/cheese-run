@@ -17,12 +17,25 @@ class Element(ABC):
         def interact(self):
             pass
 
+        def is_below(self, char: Character) -> bool:
+            """Determines whether the obstacle is below the character.
+
+            Args:
+                char (Character): The character being tested.
+
+            Returns:
+                bool: Whether the obstacle is below the character.
+            """
+            return(
+                (self._posn[0] <= char.pos[0] + char.dim[0] <= self._posn[0] + self._dim[0]) and
+                (self._posn[1] < char.pos[1] + char.dim[1])
+            )
+
         def was_hit(self, char: Character) -> bool:
             """Determines if a character has interacted with the game element.
 
             Args:
-                c_pos (tuple): The character's position coordinate (top left of character)
-                c_dim (tuple): The character's dimensions (length and width)
+                char (Character): The character being tested. 
 
             Returns:
                 bool: Whether or not the character 'hit' the element. 

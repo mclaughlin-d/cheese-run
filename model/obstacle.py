@@ -7,6 +7,10 @@ class Obstacle(Element):
     Args:
         Element (Element): The parent class.
     """
+    TYPE_1 = {
+        # will eventually have a few of these with different image paths, types, damage, etc
+    }
+
     def __init__(self, pos: tuple, dim: tuple, imgpath: str, block: bool, damage: int = 0) -> None:
         super().__init__(pos, dim, imgpath)
         self._block = block

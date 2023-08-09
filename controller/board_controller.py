@@ -9,8 +9,9 @@ class BoardController():
     """
     def __init__(self):
         self.game_objs = []
-
-        pass
+        self.obstacles = []
+        self.tokens = []
+        self.enemies = []
 
     def handle_keypress(self, key) -> None:
         # NOTE - alt is to bind all of these events to window with corresponding lambda functions
@@ -30,3 +31,13 @@ class BoardController():
         """
         for obj in self.game_objs:
             obj.update_posn()
+
+    def add_obstacle(self) -> None:
+        """Adds a new obstacle to the board. 
+        """
+        new_obstacle = Obstacle()# add parameters later!
+        self.obstacles.append(new_obstacle)
+
+    def get_elements(self) -> list:
+        self.game_objs = [].extend(self.obstacles).extend(self.tokens).extend(self.enemies)
+        return self.game_objs
