@@ -7,6 +7,18 @@ from model.token import Token
 class BoardController():
     """Stores all of the game elements currently active.
     """
+    SMALL_SIZE = None
+    MED_SIZE = {
+        'board-width': 1200, # could change idk check background img size
+        'board-height': 700,
+        'player-width': 180,
+        'player-height': 72,
+        'player-frames': ['../assets/mouse_1_med.png', '../assets/mouse_2_med.png'],
+
+    }
+    LARGE_SIZE = None
+
+    sizes = [SMALL_SIZE, MED_SIZE, LARGE_SIZE]
     def __init__(self):
         self.game_objs = []
         self.obstacles = []
@@ -45,7 +57,7 @@ class BoardController():
 
     def update_frames(self) -> None:
         self.player.update_curr_frame()
-        
+
     def add_obstacle(self) -> None:
         """Adds a new obstacle to the board. 
         """
