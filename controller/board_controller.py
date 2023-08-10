@@ -1,4 +1,4 @@
-# from model.player import Player
+from model.player import Player
 # from model.enemy import Enemy
 from model.obstacle import Obstacle
 from model.token import Token
@@ -13,6 +13,17 @@ class BoardController():
         self.tokens = []
         self.enemies = []
 
+        self.player = Player(
+            100,
+            20,
+            5,
+            ['../assets/mouse_1_med.png', '../assets/mouse_2_med.png'],
+            [200, 500], # position, may need to adjust
+            [180, 72], 
+            0,
+            500,
+        )
+
     def handle_keypress(self, key) -> None:
         # NOTE - alt is to bind all of these events to window with corresponding lambda functions
         if key == "<Left>":
@@ -23,7 +34,7 @@ class BoardController():
             pass
         elif key == "<Down>":
             pass
-        elif key == "<Space>": # guessing on this name here
+        elif key == "<space>": 
             pass
 
     def update_posns(self) -> None:
@@ -32,6 +43,9 @@ class BoardController():
         for obj in self.game_objs:
             obj.update_posn()
 
+    def update_frames(self) -> None:
+        self.player.update_curr_frame()
+        
     def add_obstacle(self) -> None:
         """Adds a new obstacle to the board. 
         """

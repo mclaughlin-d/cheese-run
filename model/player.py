@@ -10,8 +10,8 @@ class Player(Character):
     FALL_A = 4
     JUMP_Y_VEL = -50
 
-    def __init__(self, hp: int, ran: int, dp: int, frames: List[str], pos: tuple, dim: tuple, tokens: int = 0, ground: int = 500):
-        super().__init__(hp, ran, dp, frames, pos, dim, tokens)
+    def __init__(self, hp: int, ran: int, dp: int, frames: List[str], posn: List[int], dim: tuple, tokens: int = 0, ground: int = 500):
+        super().__init__(hp, ran, dp, frames, posn, dim, tokens)
         self.vel = [0,0]
 
         self.jumping = False
@@ -37,4 +37,3 @@ class Player(Character):
         else:
             self.pos[1] += self.vel[1]
             self.vel[1] += Player.FALL_A
-        
