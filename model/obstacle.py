@@ -7,19 +7,20 @@ class Obstacle(Element):
     Args:
         Element (Element): The parent class.
     """
-    def __init__(self, pos: tuple, dim: tuple, imgpath: str, block: bool, damage: int = 0) -> None:
+    def __init__(self, pos: tuple, dim: tuple, imgpath: str, block: bool, type: int, damage: int = 0) -> None:
         super().__init__(pos, dim, imgpath)
         self._block = block
         self._damage = damage
+        self.type = type
 
-        def interact(self, char: Character):
-            """Modifies the hp of the character.
+    def interact(self, char: Character):
+        """Modifies the hp of the character.
 
-            Args:
-                char (Character): The character to modify.
-            """
-            if self._block:
-                char.set_hp(0)
-            else:
-                char.update_hp(self._damage * -1)
+        Args:
+            char (Character): The character to modify.
+        """
+        if self._block:
+            char.set_hp(0)
+        else:
+            char.update_hp(self._damage * -1)
         

@@ -1,4 +1,5 @@
 from controller.board_controller import BoardController
+from view.display import Display
 import tkinter as tk
 import random
 
@@ -12,15 +13,24 @@ class GameController():
 
     def __init__(self):
         # create window: SHOULD THSI BE IN DISPLAY INSTEAD?
-        self._win = tk.Tk()
-        self._win.bind('<KeyPress>', self.handle_keypress) #bind keypress to window
+        self._display = Display('../assets/background_med.png', 1500, 750)
 
         self._board_control = BoardController()
+
 
         self._playing = True
         self._last_refresh = None # initialize when game first created
         self._start_time = None # initialized when game first created
+
+        self.elt_tags = {
+
+        }
        
+
+    def determine_size(self) -> None:
+        s_width = self._win.winfo_screenwidth
+        s_height = self._win.winfo_screenheight
+        
 
     def create_starting_elements(self) -> None:
         pass
@@ -33,6 +43,9 @@ class GameController():
         """
         if random.randint(1, (int(1000 - (time.time() - self._start_time/10000)))) < 100:
             self._board_control.add_obstacle()
+
+    def update_view(self):
+        pass
 
     def run_game(self) -> None:
 

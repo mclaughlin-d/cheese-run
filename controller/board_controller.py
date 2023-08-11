@@ -19,7 +19,11 @@ class BoardController():
     LARGE_SIZE = None
 
     sizes = [SMALL_SIZE, MED_SIZE, LARGE_SIZE]
-    def __init__(self):
+
+    def __init__(self, width: int, height: int) -> None:
+        self.width = width
+        self.height = height
+
         self.game_objs = []
         self.obstacles = []
         self.tokens = []
@@ -36,6 +40,8 @@ class BoardController():
             500,
         )
 
+        self.player_state = 'running' # can also be 'jumping' or 'falling'
+
     def handle_keypress(self, key) -> None:
         # NOTE - alt is to bind all of these events to window with corresponding lambda functions
         if key == "<Left>":
@@ -47,7 +53,10 @@ class BoardController():
         elif key == "<Down>":
             pass
         elif key == "<space>": 
-            pass
+            if self.player_state != 'jumping':
+                self.player.jump()
+                self.player_state = 'jumping'
+                self.player.set_state(Player.JUMP_STATE)
 
     def update_posns(self) -> None:
         """Updates the positions of each object in the game.
@@ -67,3 +76,28 @@ class BoardController():
     def get_elements(self) -> list:
         self.game_objs = [].extend(self.obstacles).extend(self.tokens).extend(self.enemies)
         return self.game_objs
+    
+    def player_collide(self):
+        # NOTE = may make more sense to mvoe some of these to player instead
+        for obst in self.obstacles:
+            if obst.is_above(self.player):
+                self.player.max_y = obst.posn[1] + obst.dim[1]
+            elif obst.is_below(self.player):
+                self.player.ground = obst.posn[1]
+            elif obst.hit_top(self.player):
+                self.player.ground = obst.posn[1]
+
+    def player_collect(self):
+        for token in self.tokens:
+            if token.collided(self.player):
+                token.interact(self.player)
+                self.tokens.remove(token)
+
+    def remove_elts(self):
+        for obst in self.obstacles:
+            if obst.pos[0] + obst.dim[0] < 0:
+                self.obstacles.remove(obst)
+
+        for token in self.tokens:
+            if token.pos[0] + token.dim[0] < 0:
+                self.tokens.remove(token)

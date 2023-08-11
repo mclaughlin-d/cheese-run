@@ -11,5 +11,5 @@ class Token(Element):
         super().__init__(pos, dim, imgpath)
         self._bonus = bonus
 
-        def interact(self, char: Character):
-            char.incr_tokens(self._bonus)
+    def interact(self, char: Character):
+        char.incr_tokens(self._bonus)
