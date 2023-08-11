@@ -1,5 +1,5 @@
 from model.element import Element
-from character import Character
+from model.character import Character
 
 class Obstacle(Element):
     """Represents an obstacle that hinders the player.

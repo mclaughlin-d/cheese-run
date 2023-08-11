@@ -27,15 +27,20 @@ class GameController():
 
     sizes = [SMALL_SIZE, MED_SIZE, LARGE_SIZE]
 
-    REFRESH_INTERVAL = 0.005 # constant that controlls time interval between display updates
+    REFRESH_INTERVAL = 0.01 # constant that controlls time interval between display updates
 
     def __init__(self):
         # create window: SHOULD THSI BE IN DISPLAY INSTEAD?
-        self._display = Display('../assets/background_med.png', 1500, 750)
+
+        self.win = tk.Tk()
+        self.win.bind('<space>', self.handle_keypress) #bind keypress to window
+
+        self._display = Display(self.win, 'assets/background_med.png', 'assets/ground_med.png', 1500, 750, 'assets/mouse_1_med.png', [200,592])
 
         self._playing = True
         self._last_refresh = None # initialize when game first created
         self._start_time = None # initialized when game first created
+        self._last_player_refresh = None
 
         self.game_objs = []
         self.obstacles = []
@@ -51,14 +56,12 @@ class GameController():
             100,
             20,
             5,
-            ['../assets/mouse_1_med.png', '../assets/mouse_2_med.png'],
-            [200, 500], # position, may need to adjust
+            ['assets/mouse_1_med.png', 'assets/mouse_2_med.png'],
+            [200, 592], # position, may need to adjust
             [180, 72], 
             0,
-            500,
+            592,
         )
-
-        self.player_state = 'running' # can also be 'jumping' or 'falling'
 
     def determine_size(self) -> None:
         s_width = self._win.winfo_screenwidth
@@ -97,11 +100,10 @@ class GameController():
 
     def handle_keypress(self, key) -> None:
         # NOTE - alt is to bind all of these events to window with corresponding lambda functions
-        if key == "<space>": 
-            if self.player_state != 'jumping':
-                self.player.jump()
-                self.player_state = 'jumping'
-                self.player.set_state(Player.JUMP_STATE)
+        if self.player.state == Player.RUN_STATE:
+            print("Jump!")
+            self.player.jump()
+            self.player.set_state(Player.JUMP_STATE)
 
     def update_posns(self) -> None:
         """Updates the positions of each object in the game.
@@ -152,13 +154,49 @@ class GameController():
             if token.pos[0] + token.dim[0] < 0:
                 self.tokens.remove(token)
 
-    def run_game(self) -> None:
+    def calc_score(self):
+        time_factor = int(time.time() - self._start_time)
+        token_factor = self.player.tokens
+        return time_factor * 10 + token_factor
 
+    def run_game(self) -> None:
+        # starting stuff
+        # grab screen size
+        # determine window sizes and all that - ORand pass to game object do this elsewhere 
+        # change objects as needed
+
+        # set start time
+        self._start_time = time.time()
+        self._last_refresh = self._start_time
+        self._last_player_refresh = self._start_time
         while self._playing:
             # do game stuff
 
             # refresh the view every 0.005 seconds
             if time.time() - self._last_refresh >= GameController.REFRESH_INTERVAL:
-                self._board_control.update_posns()
+                self.update_posns()
+                self.player_collide()
+                self.player_collect()
                 self.update_view()
+
+                if self.player.state == Player.JUMP_STATE:
+                    print("JUmping!")
+                    self.player.jump()
+                    self._display.update_player(self.player.posn)
+
                 self._last_refresh = time.time()
+
+            if time.time() - self._last_player_refresh >= Player.WALK_INTERVAL:
+                self.player.update_curr_frame()
+                self._display.update_player_frame(self.player.get_curr_frame(), self.player.posn)
+                self._last_player_refresh = time.time()
+                
+
+            if self.player.check_hp() <= 0:
+                self._playing = False
+
+            self.win.update_idletasks()
+            self.win.update()
+
+        score = self.calc_score()
+        print("Score: ", score) # replace with finish window eventually and write to text file
