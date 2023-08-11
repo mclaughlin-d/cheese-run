@@ -72,10 +72,25 @@ class GameController():
         """Uses the length of game play to randomly determine obstacle generation
         """
         if random.randint(1, (int(1000 - (time.time() - self._start_time/10000)))) < 100:
-            self._board_control.add_obstacle()
+            self.add_obstacle()
+
+    def gen_token(self):
+        if random.randint(1, (int(1000 - (time.time() - self._start_time/10000)))) < 100:
+            self.add_token()
+
+    def add_token(self):
+        new_token = Token() # ADD STUFF LATER!
+        self.tokens.append(new_token)
+        self.tok_canv_objs.append(
+            self._display.add_elt(new_token._imgpath, new_token.posn)
+        )
 
     def update_view(self):
-        pass
+        for obst, obst_obj in zip(self.obstacles, self.obst_canv_objs):
+            self._display.move_elt(obst_obj, obst.posn)
+        
+        for tok, tok_obj in zip(self.tokens, self.tok_canv_objs):
+            self._display.move_elt(tok_obj, tok.posn)
 
     def update_player_posn(self):
         self._display.update_player(self.player.posn[0], self.player.posn[1])
@@ -145,5 +160,5 @@ class GameController():
             # refresh the view every 0.005 seconds
             if time.time() - self._last_refresh >= GameController.REFRESH_INTERVAL:
                 self._board_control.update_posns()
-                # AND UPDATE IN VIEW AS WELL!!!
+                self.update_view()
                 self._last_refresh = time.time()
