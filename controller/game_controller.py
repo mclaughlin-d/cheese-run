@@ -27,7 +27,7 @@ class GameController():
 
     sizes = [SMALL_SIZE, MED_SIZE, LARGE_SIZE]
 
-    REFRESH_INTERVAL = 0.01 # constant that controlls time interval between display updates
+    REFRESH_INTERVAL = 0.008 # constant that controlls time interval between display updates
 
     def __init__(self):
         # create window: SHOULD THSI BE IN DISPLAY INSTEAD?
@@ -49,6 +49,8 @@ class GameController():
         self.tokens = []
         self.tok_canv_objs = []
 
+        self.random_cieling = 10000
+
         # self.enemies = []
 
 
@@ -58,7 +60,7 @@ class GameController():
             5,
             ['assets/mouse_1_med.png', 'assets/mouse_2_med.png'],
             [200, 592], # position, may need to adjust
-            [180, 72], 
+            [180, 78], 
             0,
             592,
         )
@@ -74,15 +76,45 @@ class GameController():
     def gen_obstacle(self):
         """Uses the length of game play to randomly determine obstacle generation
         """
-        if random.randint(1, (int(1000 - (time.time() - self._start_time/10000)))) < 100:
-            self.add_obstacle()
+        if random.randint(1, self.random_cieling) < 50:
+            type = random.randint(1, 3)
+            if type == 1:
+                self.add_obstacle(
+                    [1500 + Obstacle.TYPE_1['dim'][0], 660 - Obstacle.TYPE_1['dim'][1]],
+                    Obstacle.TYPE_1['dim'],
+                    Obstacle.TYPE_1['path'],
+                    True,
+                    1
+                )
+            elif type == 2:
+                self.add_obstacle(
+                    [1500 + Obstacle.TYPE_2['dim'][0], 660 - Obstacle.TYPE_2['dim'][1]],
+                    Obstacle.TYPE_2['dim'],
+                    Obstacle.TYPE_2['path'],
+                    True,
+                    2
+                )
+            elif type == 3:
+                self.add_obstacle(
+                    [1500 + Obstacle.TYPE_3['dim'][0], 660 - Obstacle.TYPE_3['dim'][1]],
+                    Obstacle.TYPE_3['dim'],
+                    Obstacle.TYPE_3['path'],
+                    True,
+                    3
+                )
 
     def gen_token(self):
-        if random.randint(1, (int(1000 - (time.time() - self._start_time/10000)))) < 100:
-            self.add_token()
+        if random.randint(1, self.random_cieling) < 50:
+            y_pos = random.randint(50, 660 - Token.MED_TOKEN['dim'][1])
+            self.add_token(
+                [1500 + Token.MED_TOKEN['dim'][0], y_pos],
+                Token.MED_TOKEN['dim'],
+                Token.MED_TOKEN['path']
+            )
 
-    def add_token(self):
-        new_token = Token() # ADD STUFF LATER!
+    def add_token(self, pos, dim, path):
+        print("Added token")
+        new_token = Token(pos, dim, path)
         self.tokens.append(new_token)
         self.tok_canv_objs.append(
             self._display.add_elt(new_token._imgpath, new_token.posn)
@@ -101,23 +133,25 @@ class GameController():
     def handle_keypress(self, key) -> None:
         # NOTE - alt is to bind all of these events to window with corresponding lambda functions
         if self.player.state == Player.RUN_STATE:
-            print("Jump!")
             self.player.jump()
             self.player.set_state(Player.JUMP_STATE)
 
     def update_posns(self) -> None:
         """Updates the positions of each object in the game.
         """
-        for obj in self.game_objs:
-            obj.update_posn()
+        for obst in self.obstacles:
+            obst.update_posn()
+        for tok in self.tokens:
+            tok.update_posn()
 
     def update_frames(self) -> None:
         self.player.update_curr_frame()
 
-    def add_obstacle(self) -> None:
+    def add_obstacle(self, pos, dim, path, block, type) -> None:
         """Adds a new obstacle to the board. 
         """
-        new_obstacle = Obstacle()# add parameters later!
+        print("added obstacle!")
+        new_obstacle = Obstacle(pos, dim, path, block, type)# add parameters later!
         self.obstacles.append(new_obstacle)
         self.obst_canv_objs.append(
             self._display.add_elt(new_obstacle._imgpath, new_obstacle.posn)
@@ -174,13 +208,16 @@ class GameController():
 
             # refresh the view every 0.005 seconds
             if time.time() - self._last_refresh >= GameController.REFRESH_INTERVAL:
+                # randomly generate new obstacles and tokens
+                self.gen_obstacle()
+                self.gen_token()
+
                 self.update_posns()
                 self.player_collide()
                 self.player_collect()
                 self.update_view()
 
                 if self.player.state == Player.JUMP_STATE:
-                    print("JUmping!")
                     self.player.jump()
                     self._display.update_player(self.player.posn)
 

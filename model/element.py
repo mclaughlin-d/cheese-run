@@ -11,7 +11,7 @@ class Element(ABC):
         self.posn = posn
         self.dim = dim
         self._imgpath = imgpath
-        self._vel = (0,0)
+        self._vel = [-5, 0]
 
     @abstractmethod
     def interact(self):
@@ -71,7 +71,7 @@ class Element(ABC):
             (char.posn[1] + char.dim[1] <= self.posn[1])
         )
     
-    def updateposn(self) -> None:
+    def update_posn(self) -> None:
         """Updates the elements position based on its velocity.
         """
         self.posn[0] += self._vel[0]

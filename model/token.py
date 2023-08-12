@@ -7,6 +7,11 @@ class Token(Element):
     Args:
         Element (Element): The parent class.
     """
+    MED_TOKEN = {
+        'path': 'assets/cheese_med.png',
+        'dim': [57, 60]
+    }
+    
     def __init__(self, pos: tuple, dim: tuple, imgpath: str, bonus: int = 1) -> None:
         super().__init__(pos, dim, imgpath)
         self._bonus = bonus

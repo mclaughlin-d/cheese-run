@@ -29,18 +29,15 @@ class Player(Character):
         if self.posn[1] <= self.min_y:
             self.set_state(Player.FALL_STATE)
             self.vel = [0,0]
-            print("falling!")
 
         elif self.posn[1] > self.ground:
             self.set_state(Player.RUN_STATE)
             self.posn[1] = self.ground
             self.vel = [0,0]
-            print("running!")
 
         else:
             self.posn[1] += self.vel[1]
             self.vel[1] += Player.FALL_A
-            print("jumping!")
 
     def fall(self):
         # note- need to set initial velocity when these actions change
