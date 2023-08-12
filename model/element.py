@@ -75,7 +75,7 @@ class Element(ABC):
         """Updates the elements position based on its velocity.
         """
         self.posn[0] += self._vel[0]
-        self.posn[1] += self._vel[1]
+        #self.posn[1] += self._vel[1]
 
     def set_vel(self, x_vel: int, y_vel: int) -> None:
         """Sets the velocity attribute based on the parameters passed.
@@ -84,4 +84,4 @@ class Element(ABC):
             x_vel (int): The new x-velocity of the element.
             y_vel (int): The new y-velocity of the element.
         """
-        self._vel = x_vel, y_vel
+        self._vel = [x_vel, y_vel]

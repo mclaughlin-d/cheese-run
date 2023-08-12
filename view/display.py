@@ -30,7 +30,7 @@ class Display():
 
     def add_elt(self, path: str, pos: list) -> None:
         print("ADDED ELT")
-        img = self.canvas.create_image(pos[0], pos[1], image=self.imgpath_mux(path))
+        img = self.canvas.create_image(pos[0], pos[1], image=self.imgpath_mux(path), anchor="nw")
         self.canvas.pack()
         return img
 

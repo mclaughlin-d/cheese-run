@@ -88,7 +88,7 @@ class GameController():
                 )
             elif type == 2:
                 self.add_obstacle(
-                    [1500 + Obstacle.TYPE_2['dim'][0], 660 - Obstacle.TYPE_2['dim'][1]],
+                    [1500 + Obstacle.TYPE_2['dim'][0],660 - Obstacle.TYPE_2['dim'][1]],
                     Obstacle.TYPE_2['dim'],
                     Obstacle.TYPE_2['path'],
                     True,
@@ -170,10 +170,11 @@ class GameController():
                 self.player.ground = obst.posn[1]
 
     def player_collect(self):
-        for token in self.tokens:
+        for i in range(len(self.tokens)):
+            token = self.tokens[i]
             if token.collided(self.player):
                 token.interact(self.player)
-                self.tokens.remove(token)
+                self._display.del_elt(self.tok_canv_objs[i])
 
     def remove_elts(self):
         obst_to_remove = []
@@ -201,7 +202,7 @@ class GameController():
         for tok, tok_obj in zip(tokens_to_remove, tok_obj_to_remove):
             self.tokens.remove(tok)
             self.tok_canv_objs.remove(tok_obj)
-            
+
     def calc_score(self):
         time_factor = int(time.time() - self._start_time)
         token_factor = self.player.tokens
