@@ -113,7 +113,6 @@ class GameController():
             )
 
     def add_token(self, pos, dim, path):
-        print("Added token")
         new_token = Token(pos, dim, path)
         self.tokens.append(new_token)
         self.tok_canv_objs.append(
@@ -150,7 +149,6 @@ class GameController():
     def add_obstacle(self, pos, dim, path, block, type) -> None:
         """Adds a new obstacle to the board. 
         """
-        print("added obstacle!")
         new_obstacle = Obstacle(pos, dim, path, block, type)# add parameters later!
         self.obstacles.append(new_obstacle)
         self.obst_canv_objs.append(
@@ -178,16 +176,32 @@ class GameController():
                 self.tokens.remove(token)
 
     def remove_elts(self):
+        obst_to_remove = []
+        obst_obj_to_remove = []
         for i in range(len(self.obstacles)):
-            if self.obstacles[i].pos[0] + self.obstacles[i].dim[0] < 0:
-                del self.obstacles[i]
+            if self.obstacles[i].posn[0] + self.obstacles[i].dim[0] < 0:
+                print("removing obstacle")
+                obst_to_remove.append(self.obstacles[i])
                 self._display.del_elt(self.obst_canv_objs[i])
-                del self.obst_canv_objs[i]
+                obst_obj_to_remove.append(self.obst_canv_objs[i])
 
-        for token in self.tokens:
-            if token.pos[0] + token.dim[0] < 0:
-                self.tokens.remove(token)
+        for obst, obj in zip(obst_to_remove, obst_obj_to_remove):
+            self.obstacles.remove(obst)
+            self.obst_canv_objs.remove(obj)
 
+        tokens_to_remove = []
+        tok_obj_to_remove = []
+        for i in range(len(self.tokens)):
+            token = self.tokens[i]
+            if token.posn[0] + token.dim[0] < 0:
+                print("removing token")
+                tokens_to_remove.append(token)
+                tok_obj_to_remove.append(self.tok_canv_objs[i])
+
+        for tok, tok_obj in zip(tokens_to_remove, tok_obj_to_remove):
+            self.tokens.remove(tok)
+            self.tok_canv_objs.remove(tok_obj)
+            
     def calc_score(self):
         time_factor = int(time.time() - self._start_time)
         token_factor = self.player.tokens
@@ -215,6 +229,7 @@ class GameController():
                 self.update_posns()
                 self.player_collide()
                 self.player_collect()
+                self.remove_elts()
                 self.update_view()
 
                 if self.player.state == Player.JUMP_STATE:
