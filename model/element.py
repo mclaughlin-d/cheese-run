@@ -42,7 +42,7 @@ class Element(ABC):
         """
         return(
             (self.posn[0] <= char.posn[0] + char.dim[0] <= self.posn[0] + self.dim[0]) and
-            (self.posn[1] < char.posn[1])
+            (self.posn[1] + self.dim[1] < char.posn[1])
         )
 
     def collided(self, char: Character) -> bool:
@@ -54,10 +54,15 @@ class Element(ABC):
         Returns:
             bool: Whether or not the character 'hit' the element. 
         """
-        return (
-            (self.posn[0] <= char.posn[0] + char.dim[0] <= self.posn[0] + self.dim[0]) and
-            (self.posn[1] <= char.posn[1] + char.dim[1] <= self.posn[1] + self.dim[1])
-        )
+        if char.ground == self.posn[1]:
+            print("char.ground: ", char.ground)
+            return False
+        else:
+            return (
+                (self.posn[0] <= char.posn[0] + char.dim[0] < self.posn[0] + self.dim[0]) and
+                (self.posn[1] < char.posn[1] + char.dim[1])
+            )
+
     
     def hit_bottom(self, char: Character) -> bool:
         return (
@@ -68,7 +73,7 @@ class Element(ABC):
     def hit_top(self, char: Character) -> bool:
         return (
             (self.posn[0] <= char.posn[0] + char.dim[0] <= self.posn[0] + self.dim[0]) and
-            (char.posn[1] + char.dim[1] <= self.posn[1])
+            (char.posn[1] + char.dim[1] <= self.posn[1] + 5)
         )
     
     def update_posn(self) -> None:
@@ -85,3 +90,31 @@ class Element(ABC):
             y_vel (int): The new y-velocity of the element.
         """
         self._vel = [x_vel, y_vel]
+
+    def x_overlap(self, char: Character) -> bool:
+        """Determines whether the character's and obstacle's horizontal positions overlap.
+
+        Args:
+            char (Character): The character being tested
+
+        Returns:
+            bool: Whether or not their horizontal positions overlap
+        """
+        return (
+            self.posn[0] <= char.posn[0] <= self.posn[0] + self.dim[0] or
+            self.posn[0] <= char.posn[0] + char.dim[0] <= self.posn[0] + self.dim[0]
+        )
+    
+    def y_overlap(self, char: Character) -> bool:
+        """Determines whether the character's and obstacle's vertical positions overlap.
+
+        Args:
+            char (Character): The character being tested
+
+        Returns:
+            bool: Whether or not their vertical positions overlap
+        """
+        return (
+            self.posn[1] <= char.posn[1] <= self.posn[1] + self.dim[1] or
+            self.posn[1] <= char.posn[1] + char.dim[1] <= self.posn[1] + self.dim[1]
+        )

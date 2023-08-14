@@ -76,7 +76,7 @@ class GameController():
     def gen_obstacle(self):
         """Uses the length of game play to randomly determine obstacle generation
         """
-        if random.randint(1, self.random_cieling) < 50:
+        if random.randint(1, self.random_cieling) < 20:
             type = random.randint(1, 3)
             if type == 1:
                 self.add_obstacle(
@@ -104,7 +104,7 @@ class GameController():
                 )
 
     def gen_token(self):
-        if random.randint(1, self.random_cieling) < 50:
+        if random.randint(1, self.random_cieling) < 20:
             y_pos = random.randint(50, 660 - Token.MED_TOKEN['dim'][1])
             self.add_token(
                 [1500 + Token.MED_TOKEN['dim'][0], y_pos],
@@ -161,13 +161,33 @@ class GameController():
     
     def player_collide(self):
         # NOTE = may make more sense to mvoe some of these to player instead
+        is_above = False
         for obst in self.obstacles:
             if obst.is_above(self.player):
-                self.player.max_y = obst.posn[1] + obst.dim[1]
+                self.player.min_y = obst.posn[1] + obst.dim[1]
+                print("Obst above player!")
             elif obst.is_below(self.player):
                 self.player.ground = obst.posn[1]
-            elif obst.hit_top(self.player):
-                self.player.ground = obst.posn[1]
+                is_above = True
+                print("Obst below player!")
+            elif (self.player.ground == obst.dim[1] and 
+                (obst.posn[0] <= self.player.posn[0] <= obst.posn[0] + obst.dim[0] 
+                 or obst.posn[0] <= self.player.posn[0] + self.player.dim[0] <= obst).posn[0] + obst.dim[0]
+                ):
+                self.player.set_state(Player.RUN_STATE)
+                is_above = True
+                print("player above obst!")
+            elif obst.collided(self.player):
+                obst.interact(self.player)
+                print("Player collided with obstacle!")
+
+        print("is_avobe: ", is_above)
+
+        if (not is_above) and self.player.ground != 592:
+            self.player.set_state(Player.FALL_STATE)
+            self.player.ground = 592
+            self.player.vel = [0, 3]
+            self.player.fall()
 
     def player_collect(self):
         for i in range(len(self.tokens)):
@@ -224,6 +244,7 @@ class GameController():
             # refresh the view every 0.005 seconds
             if time.time() - self._last_refresh >= GameController.REFRESH_INTERVAL:
                 # randomly generate new obstacles and tokens
+                print("self.player.ground: ", self.player.ground, "state: ", self.player.state)
                 self.gen_obstacle()
                 self.gen_token()
 
@@ -235,6 +256,9 @@ class GameController():
 
                 if self.player.state == Player.JUMP_STATE:
                     self.player.jump()
+                    self._display.update_player(self.player.posn)
+                elif self.player.state == Player.FALL_STATE:
+                    self.player.fall()
                     self._display.update_player(self.player.posn)
 
                 self._last_refresh = time.time()
