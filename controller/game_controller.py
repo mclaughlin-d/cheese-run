@@ -5,6 +5,7 @@ from model.player import Player
 # from model.enemy import Enemy
 from model.obstacle import Obstacle
 from model.token import Token
+from model.sound import GameSound
 
 import time
 
@@ -51,7 +52,11 @@ class GameController():
 
         self.random_cieling = 10000
 
+        self.jump_sound = GameSound(GameSound.JUMP_SOUND)
+
         self.elt_vel = [-5, 0]
+
+        self.sound_processes = []
 
         # self.enemies = []
 
@@ -137,6 +142,7 @@ class GameController():
         # NOTE - alt is to bind all of these events to window with corresponding lambda functions
         if self.player.state == Player.RUN_STATE:
             self.player.jump()
+            self.jump_sound.play_asynch()
             self.player.set_state(Player.JUMP_STATE)
 
     def update_posns(self) -> None:
