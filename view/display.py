@@ -21,7 +21,9 @@ class Display():
     
         self.token_text = "Tokens Collected: "
         self.token_label = tk.Label(self.win, font='arial', text=self.token_text, anchor='nw')
-        self.token_label.place(x=20, y=20)
+        
+        self.rules_text = ""
+        self.rules_label = tk.Label(self.win, font='arial', text=self.rules_text, anchor=tk.CENTER)
         self.canvas.pack()
 
 
@@ -37,6 +39,17 @@ class Display():
         img = self.canvas.create_image(pos[0], pos[1], image=self.imgpath_mux(path), anchor="nw")
         self.canvas.pack()
         return img
+
+    def place_token_label(self):
+        self.token_label.place(x=20, y=20)
+
+    def set_rules(self, rules: str):
+        self.rules_text = rules
+        self.rules_label.config(text = self.rules_text)
+        self.rules_label.place(x=30, y=50)
+
+    def remove_rules(self):
+        self.rules_label.destroy()
 
     def del_elt(self, id):
         self.canvas.delete(id)
