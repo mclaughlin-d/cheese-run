@@ -31,7 +31,8 @@ class Character():
         Args:
             hp_val (int): The new hp value.
         """
-        self._hp = hp_val
+        if type(hp_val) == int:
+            self._hp = hp_val
     
     def check_hp(self) -> int:
         return self._hp

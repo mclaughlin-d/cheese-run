@@ -4,8 +4,7 @@ from PIL import Image
 class Display():
     """Displays all of the images corresponding to each active game element. 
     """
-    # NOTE = cannot have photoimage here bcs tk needs a root window or smth - INVESTIGATE
-
+    
     def __init__(self, win, bg_path, ground_path, width, height, play_path, player_posn):
         self.win = win
 
@@ -19,11 +18,20 @@ class Display():
         self.player_img = tk.PhotoImage(file=play_path)
         self.player = self.canvas.create_image(player_posn[0], player_posn[1], image=self.player_img, anchor="nw")
     
-        self.token_text = "Tokens Collected: "
+        self.token_text = "Tokens Collected: 0"
         self.token_label = tk.Label(self.win, font='arial', text=self.token_text, anchor='nw')
         
         self.rules_text = ""
         self.rules_label = tk.Label(self.win, font='arial', text=self.rules_text, anchor=tk.CENTER)
+
+        self.score_text = "Your score was: "
+        self.score_label = tk.Label(self.win, font='arial', text=self.score_text, anchor='nw')
+
+        self.high_score_text = ""
+        self.high_score_label = tk.Label(self.win, font='arial', text = self.rules_text, anchor = tk.CENTER)
+        self.name_label = tk.Label(self.win, text="Type your name and press 'enter' to submit.\nThen press the right arrow key to restart the game, or 'esc' to exit.\n", font='arial')
+        self.name_entry = tk.Entry(self.win, width=40)
+
         self.canvas.pack()
 
 
@@ -49,7 +57,7 @@ class Display():
         self.rules_label.place(x=30, y=50)
 
     def remove_rules(self):
-        self.rules_label.destroy()
+        self.rules_label.place_forget()
 
     def del_elt(self, id):
         self.canvas.delete(id)
@@ -77,3 +85,35 @@ class Display():
     def update_token_msg(self, num_collected):
         self.token_text = "Tokens Collected: " + str(num_collected)
         self.token_label.config(text = self.token_text)
+
+    def get_score_name(self) -> str:
+        name = self.name_entry.get()
+        self.name_entry.config(state=tk.DISABLED)
+        self.name_entry.place_forget()
+        if name == '':
+            name = 'anonymous'
+        
+        return name
+    
+    def set_score_label(self, score) -> None:
+        self.score_text = "Your score was: " + str(score)
+        self.score_label.config(text = self.score_text)
+
+    def set_high_score_label(self, text) -> None:
+        self.high_score_text = text
+        self.high_score_label.config(text = self.high_score_text)
+
+    def create_score_screen(self) -> None:
+
+        self.score_label.place(relx=0.5, y = 50)
+        self.high_score_label.place(relx=0.5, y=100)
+        self.name_label.place(relx=0.5, y=150)
+        self.name_entry = tk.Entry(self.win, width=40)
+        self.name_entry.config(state=tk.NORMAL)
+        self.name_entry.place(relx=0.5, y=200)
+
+    def remove_score_screen(self):
+        self.high_score_label.place_forget()
+        self.score_label.place_forget()
+        self.name_entry.place_forget()
+        self.name_label.place_forget()
