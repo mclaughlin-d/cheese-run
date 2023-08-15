@@ -87,7 +87,7 @@ class Element(ABC):
         """Updates the elements position based on its velocity.
         """
         self.posn[0] += self._vel[0]
-        #self.posn[1] += self._vel[1]
+        self.posn[1] += self._vel[1]
 
     def set_vel(self, x_vel: int, y_vel: int) -> None:
         """Sets the velocity attribute based on the parameters passed.
@@ -109,7 +109,7 @@ class Element(ABC):
         """
         return (
             self.posn[0] <= x + width <= self.posn[0] + self.dim[0] or
-            self.posn[0] <= x <= self.posn[0] + self.dim[0]
+            self.posn[0] <= x + 70 <= self.posn[0] + self.dim[0]
         )
     
     def y_overlap(self, y, width) -> bool:

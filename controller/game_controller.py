@@ -133,7 +133,7 @@ class GameController():
 
     def gen_token(self):
         if random.randint(1, 10000) < 20:
-            y_pos = random.randint(50, 600 - Token.MED_TOKEN['dim'][1])
+            y_pos = random.randint(50, 580 - Token.MED_TOKEN['dim'][1])
             self.add_token(
                 [1500 + Token.MED_TOKEN['dim'][0], y_pos],
                 Token.MED_TOKEN['dim'],
@@ -336,14 +336,15 @@ class GameController():
         # change objects as needed
 
         # set start time
-        self._start_time = time.time()
-        self._last_refresh = self._start_time
-        self._last_player_refresh = self._start_time
 
         # intro screen stuff
         
         while self._running:
+            self.random_cieling = 10000
             self.set_rules('assets/text/rules.txt')
+            self._start_time = time.time()
+            self._last_refresh = self._start_time
+            self._last_player_refresh = self._start_time
             while self._start_screen:
                 self.win.update_idletasks()
                 self.win.update()

@@ -43,7 +43,6 @@ class Display():
         self.OBST_3_MED_IMG = tk.PhotoImage(file='assets/obst_3_med.png')
 
     def add_elt(self, path: str, pos: list) -> None:
-        print("ADDED ELT")
         img = self.canvas.create_image(pos[0], pos[1], image=self.imgpath_mux(path), anchor="nw")
         self.canvas.pack()
         return img
