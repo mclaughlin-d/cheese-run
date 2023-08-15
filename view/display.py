@@ -51,6 +51,9 @@ class Display():
     def place_token_label(self):
         self.token_label.place(x=20, y=20)
 
+    def remove_token_label(self):
+        self.token_label.place_forget()
+
     def set_rules(self, rules: str):
         self.rules_text = rules
         self.rules_label.config(text = self.rules_text)

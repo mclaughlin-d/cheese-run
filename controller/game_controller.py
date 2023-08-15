@@ -353,6 +353,7 @@ class GameController():
                 self.win.update_idletasks()
                 self.win.update()
             self._display.remove_rules()
+            self._display.update_token_msg(0)
             self._display.place_token_label()
             # do game stuff
             while self._playing:
@@ -390,6 +391,7 @@ class GameController():
                 self.win.update_idletasks()
                 self.win.update()
 
+            self._display.remove_token_label()
             self._score_screen = True
             self._display.set_score_label(self.calc_score())
             self.set_high_score_label()
