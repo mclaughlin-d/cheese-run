@@ -29,6 +29,8 @@ class GameController():
 
     REFRESH_INTERVAL = 0.008 # constant that controlls time interval between display updates
 
+    SCORES_PATH = 'assets/text/scores.txt'
+
     def __init__(self):
         # create window: SHOULD THSI BE IN DISPLAY INSTEAD?
 
@@ -255,6 +257,33 @@ class GameController():
         token_factor = self.player.tokens
         return time_factor * 10 + token_factor
 
+    def write_score(self, score):
+        try:
+            with open(GameController.SCORES_PATH, 'a') as f:
+                f.write('\n' + str(score))
+
+        except FileNotFoundError:
+            print("Scores file not found.")
+            return
+        
+    def get_high_score(self) -> str:
+        high_score = 0
+        try:
+            with open(GameController.SCORES_PATH, 'r') as f:
+                for line in f:
+                    try: 
+                        score = int(line)
+                        if score > high_score:
+                            high_score = score
+                    except:
+                        print("Not an int?")
+                
+        except FileNotFoundError:
+            print("Scores file not found.")
+            return high_score
+        
+        return high_score
+        
     def run_game(self) -> None:
         # starting stuff
         # grab screen size
@@ -312,4 +341,7 @@ class GameController():
 
             score = self.calc_score()
             print("Score: ", score) # replace with finish window eventually and write to text file
+            self.write_score(score)
+            print("High score: ", self.get_high_score())
+            
             self._running = False # change this later!!
