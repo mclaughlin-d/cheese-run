@@ -60,28 +60,6 @@ class Element(ABC):
             return (
                 self.x_overlap(char.posn[0], char.dim[0]) and self.y_overlap(char.posn[1], char.dim[1])
             )
-
-    
-    def hit_bottom(self, char: Character) -> bool:
-        """
-
-        Args:
-            char (Character): _description_
-
-        Returns:
-            bool: _description_
-        """
-        print("THIS METHOD WAS CALLED!")
-        return (
-            (self.posn[0] <= char.posn[0] + char.dim[0] <= self.posn[0] + self.dim[0]) and
-            (char.posn[1] <= self.posn[1] + self.dim[1])
-        )
-
-    def hit_top(self, char: Character) -> bool:
-        return (
-            (self.posn[0] <= char.posn[0] + char.dim[0] <= self.posn[0] + self.dim[0]) and
-            (char.posn[1] + char.dim[1] <= self.posn[1] + 5)
-        )
     
     def update_posn(self) -> None:
         """Updates the elements position based on its velocity.

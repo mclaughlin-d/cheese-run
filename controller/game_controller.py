@@ -324,7 +324,7 @@ class GameController():
     
     def set_high_score_label(self):
         name, score = self.get_high_score()
-        self._display.set_high_score_label(f"The previous high score:\n{name}: {score}")
+        self._display.set_high_score_label(f"The high score:\n{name}: {score}")
 
     def get_name(self):
         return self._display.get_score_name()

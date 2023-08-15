@@ -29,7 +29,7 @@ class Display():
 
         self.high_score_text = ""
         self.high_score_label = tk.Label(self.win, font='arial', text = self.rules_text, anchor = tk.CENTER)
-        self.name_label = tk.Label(self.win, text="Type your name and press 'enter' to submit.\nThen press the right arrow key to restart the game, or 'esc' to exit.\n", font='arial')
+        self.name_label = tk.Label(self.win, text="Type your name and press 'enter' to submit your score.\nPress the right arrow key to restart the game, or 'esc' to exit.\n", font='arial')
         self.name_entry = tk.Entry(self.win, width=40)
 
         self.canvas.pack()
