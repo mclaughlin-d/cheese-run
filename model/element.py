@@ -99,8 +99,8 @@ class Element(ABC):
             bool: Whether or not their horizontal positions overlap
         """
         return (
-            self.posn[0] <= x <= self.posn[0] + self.dim[0] or
-            self.posn[0] <= x + width <= self.posn[0] + self.dim[0]
+            self.posn[0] <= x + width <= self.posn[0] + self.dim[0] or
+            self.posn[0] <= x <= self.posn[0] + self.dim[0]
         )
     
     def y_overlap(self, y, width) -> bool:

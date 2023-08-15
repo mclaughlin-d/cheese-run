@@ -229,16 +229,13 @@ class GameController():
         for obst in self.obstacles:
             if obst.is_above(self.player):
                 self.player.min_y = obst.posn[1] + obst.dim[1]
+                print("0bst above player!")
             elif obst.is_below(self.player):
                 self.player.ground = obst.posn[1] - self.player.dim[1]
                 is_above = True
-            elif (
-                    self.player.ground == obst.posn[1] - self.player.dim[1] and 
-                    obst.posn[0] <= self.player.posn[0] <= obst.posn[0] + obst.dim[0] or obst.posn[0] <= self.player.posn[0] + self.player.dim[0] <= obst.posn[0] + obst.dim[0]
-                ):
-                self.player.set_state(Player.RUN_STATE)
-                is_above = True
+                print("player above obst!")
             elif obst.collided(self.player):
+                print("collided!")
                 obst.interact(self.player)
 
         if (not is_above) and self.player.ground != 592:
@@ -313,8 +310,8 @@ class GameController():
                 for line in f:
                     try: 
                         stuff = line.split()
-                        name = stuff[0]
-                        score = int(stuff[1])
+                        name = ' '.join(stuff[0:len(stuff) - 1])
+                        score = int(stuff[-1])
                         if score > high_score:
                             high_score = score
                             high_name = name
