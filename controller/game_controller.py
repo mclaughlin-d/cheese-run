@@ -36,12 +36,14 @@ class GameController():
 
         self.win = tk.Tk()
         self.win.bind('<space>', self.handle_keypress) #bind keypress to window
-
+        self.win.bind('<Escape>', lambda e: self.win.destroy())
+        self.win.bind('<Return>', self.write_score)
         self._display = Display(self.win, 'assets/background_med.png', 'assets/ground_med.png', 1500, 750, 'assets/mouse_1_med.png', [200,592])
 
         self._playing = False
         self._start_screen = True
         self._running = True
+        self._score_screen = False
         self._last_refresh = None # initialize when game first created
         self._start_time = None # initialized when game first created
         self._last_player_refresh = None
@@ -78,7 +80,10 @@ class GameController():
         try:
             with open(rule_filepath, 'r') as f:
                 for line in f:
-                    rules_str += line + '\n'
+                    rules_str += line
+                    if line.strip('\n')[-1] == '.':
+                        rules_str += '\n'
+
         except FileNotFoundError:
             print("File not found.")
             return
@@ -149,8 +154,9 @@ class GameController():
 
     def handle_keypress(self, key) -> None:
         # NOTE - alt is to bind all of these events to window with corresponding lambda functions
-        if self._start_screen:
+        if self._start_screen or self._score_screen:
             self._start_screen = False
+            self._score_screen = False
             self._playing = True
 
         elif self._playing:
@@ -257,10 +263,12 @@ class GameController():
         token_factor = self.player.tokens
         return time_factor * 10 + token_factor
 
-    def write_score(self, score):
+    def write_score(self, key):
+        score = self.calc_score()
+        name = self.get_name()
         try:
             with open(GameController.SCORES_PATH, 'a') as f:
-                f.write('\n' + str(score))
+                f.write('\n' + name + ' ' + str(score))
 
         except FileNotFoundError:
             print("Scores file not found.")
@@ -268,22 +276,33 @@ class GameController():
         
     def get_high_score(self) -> str:
         high_score = 0
+        high_name = 'anonymous'
         try:
             with open(GameController.SCORES_PATH, 'r') as f:
                 for line in f:
                     try: 
-                        score = int(line)
+                        stuff = line.split()
+                        name = stuff[0]
+                        score = int(stuff[1])
                         if score > high_score:
                             high_score = score
+                            high_name = name
                     except:
-                        print("Not an int?")
+                        print("Error getting data.")
                 
         except FileNotFoundError:
             print("Scores file not found.")
             return high_score
         
-        return high_score
-        
+        return high_name, high_score
+    
+    def set_high_score_label(self):
+        name, score = self.get_high_score()
+        self._display.set_high_score_label(f"The previous high score:\n{name}: {score}")
+
+    def get_name(self):
+        return self._display.get_score_name()
+
     def run_game(self) -> None:
         # starting stuff
         # grab screen size
@@ -294,14 +313,16 @@ class GameController():
         self._start_time = time.time()
         self._last_refresh = self._start_time
         self._last_player_refresh = self._start_time
+
+        # intro screen stuff
+        self.set_rules('assets/text/rules.txt')
+        while self._start_screen:
+            self.win.update_idletasks()
+            self.win.update()
+        self._display.remove_rules()
+        self._display.place_token_label()
+        
         while self._running:
-            # intro screen stuff
-            self.set_rules('assets/text/rules.txt')
-            while self._start_screen:
-                self.win.update_idletasks()
-                self.win.update()
-            self._display.remove_rules()
-            self._display.place_token_label()
 
             # do game stuff
             while self._playing:
@@ -339,9 +360,12 @@ class GameController():
                 self.win.update_idletasks()
                 self.win.update()
 
-            score = self.calc_score()
-            print("Score: ", score) # replace with finish window eventually and write to text file
-            self.write_score(score)
-            print("High score: ", self.get_high_score())
+            self._score_screen = True
+            self._display.set_score_label(self.calc_score())
+            self.set_high_score_label()
+            self._display.create_score_screen()
+            while self._score_screen:
+                self.win.update_idletasks()
+                self.win.update()
             
-            self._running = False # change this later!!
+            self._start_screen = True

@@ -1,8 +1,13 @@
 Welcome to Cheese Run!
 Your backstory:
-You are a mouse running through the cave of magical cheese trying to collect the tastiest cheese in all of the lands.
+You are a mouse running through the cave of magical cheese trying 
+to collect the tastiest cheese in all of the lands.
 Your goal:
-collect as much cheese as possible to add to your score, but make sure not to run into any obstacles. You can jump onto an obstacle but if you run into it, unfortunately your time in the magical cave will end.
+collect as much cheese as possible to add to your score, but make 
+sure not to run into any obstacles. You can jump onto an obstacle 
+but if you run into it, unfortunately your time in the magical 
+cave will end.
 Tools:
 Press the space bar to jump.
+Press the 'esc' key to close the application.
 Good luck!
