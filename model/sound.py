@@ -1,16 +1,14 @@
-from playsound import playsound, PlaysoundException
 import threading
-import multiprocessing
+from playsound import playsound
+
 
 class GameSound:
-    TOK_COLLECT = 'assets/sounds/cheese_collect.mp3'
-    JUMP_SOUND = 'assets/sounds/jump_sound.wav'
+    JUMP_SOUND = 'assets/sound/jump_sound.wav'
+    TOKEN_SOUND = 'assets/sound/token_sound.mp3'
 
-    def __init__(self, filepath):
-        self.thread = multiprocessing.Process(target=self.play_asynch, args=(filepath,))
+    def __init__(self, path):
+        self.path = path
 
-    def play_asynch(self, file):
-        playsound(file)
-
-    def play_sound(self):
-        self.thread.start()
+    def play_async(self):
+        thread = threading.Thread(target=playsound, args=(self.path, ))
+        thread.start()

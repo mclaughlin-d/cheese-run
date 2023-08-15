@@ -5,6 +5,7 @@ from model.player import Player
 # from model.enemy import Enemy
 from model.obstacle import Obstacle
 from model.token import Token
+from model.sound import GameSound
 
 import time
 
@@ -53,8 +54,11 @@ class GameController():
 
         self.random_cieling = 10000
 
-        self.elt_vel = [-5, 0]
+        # sounds:
+        self.token_sound = GameSound(GameSound.TOKEN_SOUND)
+        self.jump_sound = GameSound(GameSound.JUMP_SOUND)
 
+        self.elt_vel = [-5, 0]
 
         self.player = Player(
             100,
@@ -146,7 +150,7 @@ class GameController():
         self._display.update_player(self.player.posn[0], self.player.posn[1])
 
     def handle_keypress(self, key) -> None:
-        # NOTE - alt is to bind all of these events to window with corresponding lambda functions
+       
         if self._start_screen:
             self._start_screen = False
             self._playing = True
@@ -154,6 +158,7 @@ class GameController():
         elif self._playing:
             if self.player.state == Player.RUN_STATE:
                 self.player.jump()
+                self.jump_sound.play_async()
                 self.player.set_state(Player.JUMP_STATE)
 
     def update_posns(self) -> None:
@@ -218,6 +223,7 @@ class GameController():
                 tokens_to_del.append(token)
                 tok_canv_objs_to_del.append(self.tok_canv_objs[i])
                 token.interact(self.player)
+                self.token_sound.play_async()
                 self._display.del_elt(self.tok_canv_objs[i])
                 self._display.update_token_msg(self.player.num_tokens)
 
