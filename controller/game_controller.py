@@ -185,14 +185,15 @@ class GameController():
             592,
         )
 
-        for obst, obj in zip(self.obstacles, self.obst_canv_objs):
-            self.obstacles.remove(obst)
+        for obj in self.obst_canv_objs:
             self._display.del_elt(obj)
-            self.obst_canv_objs.remove(obj)
-        for tok, tok_obj in zip(self.tokens, self.tok_canv_objs):
-            self.tokens.remove(tok)
+        for tok_obj in self.tok_canv_objs:
             self._display.del_elt(tok_obj)
-            self.tok_canv_objs.remove(tok_obj)
+
+        self.obstacles = []
+        self.obst_canv_objs = []
+        self.tokens = []
+        self.tok_canv_objs = []
 
     def update_posns(self) -> None:
         """Updates the positions of each object in the game.
@@ -229,13 +230,10 @@ class GameController():
         for obst in self.obstacles:
             if obst.is_above(self.player):
                 self.player.min_y = obst.posn[1] + obst.dim[1]
-                print("0bst above player!")
             elif obst.is_below(self.player):
                 self.player.ground = obst.posn[1] - self.player.dim[1]
                 is_above = True
-                print("player above obst!")
             elif obst.collided(self.player):
-                print("collided!")
                 obst.interact(self.player)
 
         if (not is_above) and self.player.ground != 592:

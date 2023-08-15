@@ -63,6 +63,15 @@ class Element(ABC):
 
     
     def hit_bottom(self, char: Character) -> bool:
+        """
+
+        Args:
+            char (Character): _description_
+
+        Returns:
+            bool: _description_
+        """
+        print("THIS METHOD WAS CALLED!")
         return (
             (self.posn[0] <= char.posn[0] + char.dim[0] <= self.posn[0] + self.dim[0]) and
             (char.posn[1] <= self.posn[1] + self.dim[1])
