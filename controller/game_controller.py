@@ -51,6 +51,8 @@ class GameController():
 
         self.random_cieling = 10000
 
+        self.elt_vel = [-5, 0]
+
         # self.enemies = []
 
 
@@ -70,14 +72,16 @@ class GameController():
         s_height = self._win.winfo_screenheight
         
 
-    def create_starting_elements(self) -> None:
-        pass
+    def update_rand_cieling(self) -> None:
+        self.random_cieling = int(self.random_cieling - (time.time() - self._start_time)/100)
+        if self.random_cieling < 100:
+            self.random_cieling = 100
 
     def gen_obstacle(self):
         """Uses the length of game play to randomly determine obstacle generation
         """
         if random.randint(1, self.random_cieling) < 20:
-            type = random.randint(1, 3)
+            type = random.randint(1, 2)
             if type == 1:
                 self.add_obstacle(
                     [1500 + Obstacle.TYPE_1['dim'][0], 660 - Obstacle.TYPE_1['dim'][1]],
@@ -104,7 +108,7 @@ class GameController():
                 )
 
     def gen_token(self):
-        if random.randint(1, self.random_cieling) < 20:
+        if random.randint(1, 10000) < 20:
             y_pos = random.randint(50, 660 - Token.MED_TOKEN['dim'][1])
             self.add_token(
                 [1500 + Token.MED_TOKEN['dim'][0], y_pos],
@@ -149,15 +153,20 @@ class GameController():
     def add_obstacle(self, pos, dim, path, block, type) -> None:
         """Adds a new obstacle to the board. 
         """
+        if len(self.obstacles) > 0:
+            last_obst = self.obstacles[-1]
+            if pos[0] > 1500 and last_obst.x_overlap(pos[0], dim[0]):
+                return
+            
         new_obstacle = Obstacle(pos, dim, path, block, type)# add parameters later!
+        new_obstacle.vel = self.elt_vel
         self.obstacles.append(new_obstacle)
         self.obst_canv_objs.append(
             self._display.add_elt(new_obstacle._imgpath, new_obstacle.posn)
         )
 
-    def get_elements(self) -> list:
-        self.game_objs = [].extend(self.obstacles).extend(self.tokens).extend(self.enemies)
-        return self.game_objs
+    def update_elt_vel(self) -> None:
+        self.elt_vel = [-1 * int(5 + 2*(time.time() - self._start_time)), 0]
     
     def player_collide(self):
         # NOTE = may make more sense to mvoe some of these to player instead
@@ -165,23 +174,17 @@ class GameController():
         for obst in self.obstacles:
             if obst.is_above(self.player):
                 self.player.min_y = obst.posn[1] + obst.dim[1]
-                print("Obst above player!")
             elif obst.is_below(self.player):
-                self.player.ground = obst.posn[1]
+                self.player.ground = obst.posn[1] - self.player.dim[1]
                 is_above = True
-                print("Obst below player!")
-            elif (self.player.ground == obst.dim[1] and 
-                (obst.posn[0] <= self.player.posn[0] <= obst.posn[0] + obst.dim[0] 
-                 or obst.posn[0] <= self.player.posn[0] + self.player.dim[0] <= obst).posn[0] + obst.dim[0]
+            elif (
+                    self.player.ground == obst.posn[1] - self.player.dim[1] and 
+                    obst.posn[0] <= self.player.posn[0] <= obst.posn[0] + obst.dim[0] or obst.posn[0] <= self.player.posn[0] + self.player.dim[0] <= obst.posn[0] + obst.dim[0]
                 ):
                 self.player.set_state(Player.RUN_STATE)
                 is_above = True
-                print("player above obst!")
             elif obst.collided(self.player):
                 obst.interact(self.player)
-                print("Player collided with obstacle!")
-
-        print("is_avobe: ", is_above)
 
         if (not is_above) and self.player.ground != 592:
             self.player.set_state(Player.FALL_STATE)
@@ -190,18 +193,26 @@ class GameController():
             self.player.fall()
 
     def player_collect(self):
+        tokens_to_del = []
+        tok_canv_objs_to_del = []
         for i in range(len(self.tokens)):
             token = self.tokens[i]
             if token.collided(self.player):
+                tokens_to_del.append(token)
+                tok_canv_objs_to_del.append(self.tok_canv_objs[i])
                 token.interact(self.player)
                 self._display.del_elt(self.tok_canv_objs[i])
+                self._display.update_token_msg(self.player.num_tokens)
+
+        for tok, obj in zip(tokens_to_del, tok_canv_objs_to_del):
+            self.tokens.remove(tok)
+            self.tok_canv_objs.remove(obj)
 
     def remove_elts(self):
         obst_to_remove = []
         obst_obj_to_remove = []
         for i in range(len(self.obstacles)):
             if self.obstacles[i].posn[0] + self.obstacles[i].dim[0] < 0:
-                print("removing obstacle")
                 obst_to_remove.append(self.obstacles[i])
                 self._display.del_elt(self.obst_canv_objs[i])
                 obst_obj_to_remove.append(self.obst_canv_objs[i])
@@ -215,7 +226,6 @@ class GameController():
         for i in range(len(self.tokens)):
             token = self.tokens[i]
             if token.posn[0] + token.dim[0] < 0:
-                print("removing token")
                 tokens_to_remove.append(token)
                 tok_obj_to_remove.append(self.tok_canv_objs[i])
 
@@ -244,7 +254,6 @@ class GameController():
             # refresh the view every 0.005 seconds
             if time.time() - self._last_refresh >= GameController.REFRESH_INTERVAL:
                 # randomly generate new obstacles and tokens
-                print("self.player.ground: ", self.player.ground, "state: ", self.player.state)
                 self.gen_obstacle()
                 self.gen_token()
 
@@ -262,6 +271,7 @@ class GameController():
                     self._display.update_player(self.player.posn)
 
                 self._last_refresh = time.time()
+                self.update_rand_cieling()
 
             if time.time() - self._last_player_refresh >= Player.WALK_INTERVAL:
                 self.player.update_curr_frame()

@@ -18,6 +18,10 @@ class Display():
 
         self.player_img = tk.PhotoImage(file=play_path)
         self.player = self.canvas.create_image(player_posn[0], player_posn[1], image=self.player_img, anchor="nw")
+    
+        self.token_text = "Tokens Collected: "
+        self.token_label = tk.Label(self.win, font='arial', text=self.token_text, anchor='nw')
+        self.token_label.place(x=20, y=20)
         self.canvas.pack()
 
 
@@ -56,3 +60,7 @@ class Display():
             return self.OBST_2_MED_IMG
         elif path == 'assets/obst_3_med.png':
             return self.OBST_3_MED_IMG
+        
+    def update_token_msg(self, num_collected):
+        self.token_text = "Tokens Collected: " + str(num_collected)
+        self.token_label.config(text = self.token_text)

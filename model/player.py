@@ -30,7 +30,7 @@ class Player(Character):
             self.set_state(Player.FALL_STATE)
             self.vel = [0,0]
 
-        elif self.posn[1] > self.ground:
+        elif self.posn[1] + self.vel[1] > self.ground:
             self.set_state(Player.RUN_STATE)
             self.posn[1] = self.ground
             self.vel = [0,0]

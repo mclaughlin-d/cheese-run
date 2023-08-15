@@ -15,6 +15,7 @@ class Character():
         self.posn = posn
         self.dim = dim
         self.tokens = tokens # should change to token_bonus or smth
+        self.num_tokens = 0
 
     def update_hp(self, hp_delta: int) -> None:
         """Updates the hp of the character.
@@ -37,6 +38,7 @@ class Character():
 
     def incr_tokens(self, t_delta: int) -> None:
         self.tokens += t_delta
+        self.num_tokens += 1
         if self.tokens < 0:
             self.tokens = 0
 
