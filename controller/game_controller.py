@@ -36,6 +36,7 @@ class GameController():
         # create window: SHOULD THSI BE IN DISPLAY INSTEAD?
 
         self.win = tk.Tk()
+        self.win.title("Cheese Run")
         self.win.bind('<space>', self.handle_keypress) #bind keypress to window
         self.win.bind('<Escape>', lambda e: self.win.destroy())
         self.win.bind('<Return>', self.write_score)
@@ -77,10 +78,17 @@ class GameController():
         )
 
     def determine_size(self) -> None:
+        """Determines the sizes of the files/window based on the screen size.
+        """
         s_width = self._win.winfo_screenwidth
         s_height = self._win.winfo_screenheight
         
-    def set_rules(self, rule_filepath) -> None:
+    def set_rules(self, rule_filepath: str) -> None:
+        """Sets the rules label for the display.
+
+        Args:
+            rule_filepath (str): The filepath for the rules.txt file.
+        """
         rules_str = ""
         try:
             with open(rule_filepath, 'r') as f:
