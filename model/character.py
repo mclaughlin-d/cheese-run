@@ -1,9 +1,7 @@
-from abc import ABC, abstractmethod
 from typing import List
 
 class Character():
-    """_summary_
-
+    """A class to represent a character in the game.
     """
 
     def __init__(self, hp: int, ran: int, dp: int, frames: List[str], posn: List[int], dim: tuple, tokens: int = 0):
@@ -35,19 +33,36 @@ class Character():
             self._hp = hp_val
     
     def check_hp(self) -> int:
+        """Used to get the value of a Character's hp.
+
+        Returns:
+            int: The character's current hp.
+        """
         return self._hp
 
     def incr_tokens(self, t_delta: int) -> None:
+        """Increments the token bonus and the number of tokens.
+
+        Args:
+            t_delta (int): The bonus provided by the collected token.
+        """
         self.tokens += t_delta
         self.num_tokens += 1
         if self.tokens < 0:
             self.tokens = 0
 
     def update_curr_frame(self) -> None:
+        """Changes the currently displayed frame of the Character.
+        """
         if self._curr_frame_index == len(self._frames) - 1:
             self._curr_frame_index = 0
         else:
             self._curr_frame_index += 1
 
     def get_curr_frame(self) -> str:
+        """Gets the currently displayed frame of the Character.
+
+        Returns:
+            str: A path to the Character's current frame. 
+        """
         return self._frames[self._curr_frame_index]

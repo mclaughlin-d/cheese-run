@@ -2,10 +2,10 @@ from typing import List
 from model.character import Character
 
 class Player(Character):
-    """_summary_
+    """A class to represent the player of the game.
 
     Args:
-        Character (_type_): _description_
+        Character (Character): The parent class.
     """
 
     FALL_A = 3
@@ -22,10 +22,12 @@ class Player(Character):
         self.vel = [0,0]
 
         self.ground = ground
-        self.min_y = 50 # change to be smth related to board later (max is usually board height, but changes if obstacle abpve)
+        self.min_y = 50
         self.state = Player.RUN_STATE
 
     def jump(self):
+        """Used to update the player's attributes while the player is jumping.
+        """
         if self.posn[1] <= self.min_y:
             self.set_state(Player.FALL_STATE)
             self.vel = [0,0]
@@ -40,7 +42,8 @@ class Player(Character):
             self.vel[1] += Player.FALL_A
 
     def fall(self):
-        # note- need to set initial velocity when these actions change
+        """Used to update the player's attributes while the player is falling.
+        """
         if self.posn[1] >= self.ground:
             self.state = Player.RUN_STATE
             self.posn[1] = self.ground
@@ -50,8 +53,14 @@ class Player(Character):
             self.vel[1] += Player.FALL_A
 
     def set_state(self, state: str) -> None:
-        # NOTE - may not even need this?
-        # also may be better to just have one state var for string and not use booleans
+        """Sets the state and modifies appropriate player attributes.
+
+        Args:
+            state (str): The new state of the player.
+
+        Raises:
+            ValueError: The state given was not an accepted state value.
+        """
         self.state = state 
         if state == Player.JUMP_STATE:
             self.vel = [0, Player.JUMP_Y_VEL]

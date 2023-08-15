@@ -1,13 +1,13 @@
-from view.display import Display
-import tkinter as tk
 import random
+import time
+import tkinter as tk
+
+from view.display import Display
 from model.player import Player
-# from model.enemy import Enemy
 from model.obstacle import Obstacle
 from model.token import Token
 from model.sound import GameSound
 
-import time
 
 class GameController():
     """Controls gameplay.
