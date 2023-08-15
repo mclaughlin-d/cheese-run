@@ -29,8 +29,8 @@ class Display():
 
         self.high_score_text = ""
         self.high_score_label = tk.Label(self.win, font='arial', text = self.rules_text, anchor = tk.CENTER)
-        self.name_label = tk.Label(self.win, text="Type your name and press 'enter' to submit:", font='arial')
-        self.name_entry = tk.Entry(width=40)
+        self.name_label = tk.Label(self.win, text="Type your name and press 'enter' to submit.\nThen press the right arrow key to restart the game, or 'esc' to exit.\n", font='arial')
+        self.name_entry = tk.Entry(self.win, width=40)
 
         self.canvas.pack()
 
@@ -57,7 +57,7 @@ class Display():
         self.rules_label.place(x=30, y=50)
 
     def remove_rules(self):
-        self.rules_label.destroy()
+        self.rules_label.place_forget()
 
     def del_elt(self, id):
         self.canvas.delete(id)
@@ -89,6 +89,7 @@ class Display():
     def get_score_name(self) -> str:
         name = self.name_entry.get()
         self.name_entry.config(state=tk.DISABLED)
+        self.name_entry.place_forget()
         if name == '':
             name = 'anonymous'
         
@@ -107,6 +108,7 @@ class Display():
         self.score_label.place(relx=0.5, y = 50)
         self.high_score_label.place(relx=0.5, y=100)
         self.name_label.place(relx=0.5, y=150)
+        self.name_entry = tk.Entry(self.win, width=40)
         self.name_entry.config(state=tk.NORMAL)
         self.name_entry.place(relx=0.5, y=200)
 
@@ -114,3 +116,4 @@ class Display():
         self.high_score_label.place_forget()
         self.score_label.place_forget()
         self.name_entry.place_forget()
+        self.name_label.place_forget()

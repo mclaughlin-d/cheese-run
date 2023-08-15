@@ -38,6 +38,7 @@ class GameController():
         self.win.bind('<space>', self.handle_keypress) #bind keypress to window
         self.win.bind('<Escape>', lambda e: self.win.destroy())
         self.win.bind('<Return>', self.write_score)
+        self.win.bind('<Right>', self.restart_game)
         self._display = Display(self.win, 'assets/background_med.png', 'assets/ground_med.png', 1500, 750, 'assets/mouse_1_med.png', [200,592])
 
         self._playing = False
@@ -154,7 +155,7 @@ class GameController():
 
     def handle_keypress(self, key) -> None:
         # NOTE - alt is to bind all of these events to window with corresponding lambda functions
-        if self._start_screen or self._score_screen:
+        if self._start_screen:
             self._start_screen = False
             self._score_screen = False
             self._playing = True
@@ -163,6 +164,30 @@ class GameController():
             if self.player.state == Player.RUN_STATE:
                 self.player.jump()
                 self.player.set_state(Player.JUMP_STATE)
+
+    def restart_game(self, key) -> None:
+        self._score_screen = False
+        self._start_screen = True
+        self._display.remove_score_screen()
+        self.player = Player(
+            100,
+            20,
+            5,
+            ['assets/mouse_1_med.png', 'assets/mouse_2_med.png'],
+            [200, 592], # position, may need to adjust
+            [180, 78], 
+            0,
+            592,
+        )
+
+        for obst, obj in zip(self.obstacles, self.obst_canv_objs):
+            self.obstacles.remove(obst)
+            self._display.del_elt(obj)
+            self.obst_canv_objs.remove(obj)
+        for tok, tok_obj in zip(self.tokens, self.tok_canv_objs):
+            self.tokens.remove(tok)
+            self._display.del_elt(tok_obj)
+            self.tok_canv_objs.remove(tok_obj)
 
     def update_posns(self) -> None:
         """Updates the positions of each object in the game.
@@ -315,15 +340,14 @@ class GameController():
         self._last_player_refresh = self._start_time
 
         # intro screen stuff
-        self.set_rules('assets/text/rules.txt')
-        while self._start_screen:
-            self.win.update_idletasks()
-            self.win.update()
-        self._display.remove_rules()
-        self._display.place_token_label()
         
         while self._running:
-
+            self.set_rules('assets/text/rules.txt')
+            while self._start_screen:
+                self.win.update_idletasks()
+                self.win.update()
+            self._display.remove_rules()
+            self._display.place_token_label()
             # do game stuff
             while self._playing:
             # refresh the view every 0.005 seconds
