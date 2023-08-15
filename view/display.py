@@ -19,7 +19,7 @@ class Display():
         self.player_img = tk.PhotoImage(file=play_path)
         self.player = self.canvas.create_image(player_posn[0], player_posn[1], image=self.player_img, anchor="nw")
     
-        self.token_text = "Tokens Collected: "
+        self.token_text = "Tokens Collected: 0"
         self.token_label = tk.Label(self.win, font='arial', text=self.token_text, anchor='nw')
         
         self.rules_text = ""
