@@ -37,7 +37,9 @@ class GameController():
 
         self._display = Display(self.win, 'assets/background_med.png', 'assets/ground_med.png', 1500, 750, 'assets/mouse_1_med.png', [200,592])
 
-        self._playing = True
+        self._playing = False
+        self._start_screen = True
+        self._running = True
         self._last_refresh = None # initialize when game first created
         self._start_time = None # initialized when game first created
         self._last_player_refresh = None
@@ -52,8 +54,6 @@ class GameController():
         self.random_cieling = 10000
 
         self.elt_vel = [-5, 0]
-
-        # self.enemies = []
 
 
         self.player = Player(
@@ -71,6 +71,18 @@ class GameController():
         s_width = self._win.winfo_screenwidth
         s_height = self._win.winfo_screenheight
         
+    def set_rules(self, rule_filepath) -> None:
+        rules_str = ""
+        try:
+            with open(rule_filepath, 'r') as f:
+                for line in f:
+                    rules_str += line + '\n'
+        except FileNotFoundError:
+            print("File not found.")
+            return
+        
+        self._display.set_rules(rules_str)
+
 
     def update_rand_cieling(self) -> None:
         self.random_cieling = int(self.random_cieling - (time.time() - self._start_time)/100)
@@ -109,7 +121,7 @@ class GameController():
 
     def gen_token(self):
         if random.randint(1, 10000) < 20:
-            y_pos = random.randint(50, 660 - Token.MED_TOKEN['dim'][1])
+            y_pos = random.randint(50, 600 - Token.MED_TOKEN['dim'][1])
             self.add_token(
                 [1500 + Token.MED_TOKEN['dim'][0], y_pos],
                 Token.MED_TOKEN['dim'],
@@ -135,9 +147,14 @@ class GameController():
 
     def handle_keypress(self, key) -> None:
         # NOTE - alt is to bind all of these events to window with corresponding lambda functions
-        if self.player.state == Player.RUN_STATE:
-            self.player.jump()
-            self.player.set_state(Player.JUMP_STATE)
+        if self._start_screen:
+            self._start_screen = False
+            self._playing = True
+
+        elif self._playing:
+            if self.player.state == Player.RUN_STATE:
+                self.player.jump()
+                self.player.set_state(Player.JUMP_STATE)
 
     def update_posns(self) -> None:
         """Updates the positions of each object in the game.
@@ -248,42 +265,51 @@ class GameController():
         self._start_time = time.time()
         self._last_refresh = self._start_time
         self._last_player_refresh = self._start_time
-        while self._playing:
+        while self._running:
+            # intro screen stuff
+            self.set_rules('assets/text/rules.txt')
+            while self._start_screen:
+                self.win.update_idletasks()
+                self.win.update()
+            self._display.remove_rules()
+            self._display.place_token_label()
+
             # do game stuff
-
+            while self._playing:
             # refresh the view every 0.005 seconds
-            if time.time() - self._last_refresh >= GameController.REFRESH_INTERVAL:
-                # randomly generate new obstacles and tokens
-                self.gen_obstacle()
-                self.gen_token()
+                if time.time() - self._last_refresh >= GameController.REFRESH_INTERVAL:
+                    # randomly generate new obstacles and tokens
+                    self.gen_obstacle()
+                    self.gen_token()
 
-                self.update_posns()
-                self.player_collide()
-                self.player_collect()
-                self.remove_elts()
-                self.update_view()
+                    self.update_posns()
+                    self.player_collide()
+                    self.player_collect()
+                    self.remove_elts()
+                    self.update_view()
 
-                if self.player.state == Player.JUMP_STATE:
-                    self.player.jump()
-                    self._display.update_player(self.player.posn)
-                elif self.player.state == Player.FALL_STATE:
-                    self.player.fall()
-                    self._display.update_player(self.player.posn)
+                    if self.player.state == Player.JUMP_STATE:
+                        self.player.jump()
+                        self._display.update_player(self.player.posn)
+                    elif self.player.state == Player.FALL_STATE:
+                        self.player.fall()
+                        self._display.update_player(self.player.posn)
 
-                self._last_refresh = time.time()
-                self.update_rand_cieling()
+                    self._last_refresh = time.time()
+                    self.update_rand_cieling()
 
-            if time.time() - self._last_player_refresh >= Player.WALK_INTERVAL:
-                self.player.update_curr_frame()
-                self._display.update_player_frame(self.player.get_curr_frame(), self.player.posn)
-                self._last_player_refresh = time.time()
-                
+                if time.time() - self._last_player_refresh >= Player.WALK_INTERVAL:
+                    self.player.update_curr_frame()
+                    self._display.update_player_frame(self.player.get_curr_frame(), self.player.posn)
+                    self._last_player_refresh = time.time()
+                    
 
-            if self.player.check_hp() <= 0:
-                self._playing = False
+                if self.player.check_hp() <= 0:
+                    self._playing = False
 
-            self.win.update_idletasks()
-            self.win.update()
+                self.win.update_idletasks()
+                self.win.update()
 
-        score = self.calc_score()
-        print("Score: ", score) # replace with finish window eventually and write to text file
+            score = self.calc_score()
+            print("Score: ", score) # replace with finish window eventually and write to text file
+            self._running = False # change this later!!
