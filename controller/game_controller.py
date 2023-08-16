@@ -1,13 +1,13 @@
-from view.display import Display
-import tkinter as tk
 import random
+import time
+import tkinter as tk
+
+from view.display import Display
 from model.player import Player
-# from model.enemy import Enemy
 from model.obstacle import Obstacle
 from model.token import Token
 from model.sound import GameSound
 
-import time
 
 class GameController():
     """Controls gameplay.
@@ -36,6 +36,7 @@ class GameController():
         # create window: SHOULD THSI BE IN DISPLAY INSTEAD?
 
         self.win = tk.Tk()
+        self.win.title("Cheese Run")
         self.win.bind('<space>', self.handle_keypress) #bind keypress to window
         self.win.bind('<Escape>', lambda e: self.win.destroy())
         self.win.bind('<Return>', self.write_score)
@@ -63,8 +64,6 @@ class GameController():
         self.token_sound = GameSound(GameSound.TOKEN_SOUND)
         self.jump_sound = GameSound(GameSound.JUMP_SOUND)
 
-        self.elt_vel = [-5, 0]
-
         self.player = Player(
             100,
             20,
@@ -77,10 +76,17 @@ class GameController():
         )
 
     def determine_size(self) -> None:
+        """Determines the sizes of the files/window based on the screen size.
+        """
         s_width = self._win.winfo_screenwidth
         s_height = self._win.winfo_screenheight
         
-    def set_rules(self, rule_filepath) -> None:
+    def set_rules(self, rule_filepath: str) -> None:
+        """Sets the rules label for the display.
+
+        Args:
+            rule_filepath (str): The filepath for the rules.txt file.
+        """
         rules_str = ""
         try:
             with open(rule_filepath, 'r') as f:
@@ -133,7 +139,7 @@ class GameController():
 
     def gen_token(self):
         if random.randint(1, 10000) < 20:
-            y_pos = random.randint(50, 600 - Token.MED_TOKEN['dim'][1])
+            y_pos = random.randint(50, 580 - Token.MED_TOKEN['dim'][1])
             self.add_token(
                 [1500 + Token.MED_TOKEN['dim'][0], y_pos],
                 Token.MED_TOKEN['dim'],
@@ -185,14 +191,15 @@ class GameController():
             592,
         )
 
-        for obst, obj in zip(self.obstacles, self.obst_canv_objs):
-            self.obstacles.remove(obst)
+        for obj in self.obst_canv_objs:
             self._display.del_elt(obj)
-            self.obst_canv_objs.remove(obj)
-        for tok, tok_obj in zip(self.tokens, self.tok_canv_objs):
-            self.tokens.remove(tok)
+        for tok_obj in self.tok_canv_objs:
             self._display.del_elt(tok_obj)
-            self.tok_canv_objs.remove(tok_obj)
+
+        self.obstacles = []
+        self.obst_canv_objs = []
+        self.tokens = []
+        self.tok_canv_objs = []
 
     def update_posns(self) -> None:
         """Updates the positions of each object in the game.
@@ -214,14 +221,10 @@ class GameController():
                 return
             
         new_obstacle = Obstacle(pos, dim, path, block, type)# add parameters later!
-        new_obstacle.vel = self.elt_vel
         self.obstacles.append(new_obstacle)
         self.obst_canv_objs.append(
             self._display.add_elt(new_obstacle._imgpath, new_obstacle.posn)
         )
-
-    def update_elt_vel(self) -> None:
-        self.elt_vel = [-1 * int(5 + 2*(time.time() - self._start_time)), 0]
     
     def player_collide(self):
         # NOTE = may make more sense to mvoe some of these to player instead
@@ -231,12 +234,6 @@ class GameController():
                 self.player.min_y = obst.posn[1] + obst.dim[1]
             elif obst.is_below(self.player):
                 self.player.ground = obst.posn[1] - self.player.dim[1]
-                is_above = True
-            elif (
-                    self.player.ground == obst.posn[1] - self.player.dim[1] and 
-                    obst.posn[0] <= self.player.posn[0] <= obst.posn[0] + obst.dim[0] or obst.posn[0] <= self.player.posn[0] + self.player.dim[0] <= obst.posn[0] + obst.dim[0]
-                ):
-                self.player.set_state(Player.RUN_STATE)
                 is_above = True
             elif obst.collided(self.player):
                 obst.interact(self.player)
@@ -291,6 +288,8 @@ class GameController():
 
     def calc_score(self):
         time_factor = int(time.time() - self._start_time)
+        print("TIME FACTOR: ", time_factor)
+        print("RAN CEILING: ", self.random_cieling)
         token_factor = self.player.tokens
         return time_factor * 10 + token_factor
 
@@ -313,8 +312,8 @@ class GameController():
                 for line in f:
                     try: 
                         stuff = line.split()
-                        name = stuff[0]
-                        score = int(stuff[1])
+                        name = ' '.join(stuff[0:len(stuff) - 1])
+                        score = int(stuff[-1])
                         if score > high_score:
                             high_score = score
                             high_name = name
@@ -329,7 +328,7 @@ class GameController():
     
     def set_high_score_label(self):
         name, score = self.get_high_score()
-        self._display.set_high_score_label(f"The previous high score:\n{name}: {score}")
+        self._display.set_high_score_label(f"The high score:\n{name}: {score}")
 
     def get_name(self):
         return self._display.get_score_name()
@@ -341,18 +340,20 @@ class GameController():
         # change objects as needed
 
         # set start time
-        self._start_time = time.time()
-        self._last_refresh = self._start_time
-        self._last_player_refresh = self._start_time
 
         # intro screen stuff
         
         while self._running:
+            self.random_cieling = 10000
             self.set_rules('assets/text/rules.txt')
+            self._start_time = time.time()
+            self._last_refresh = self._start_time
+            self._last_player_refresh = self._start_time
             while self._start_screen:
                 self.win.update_idletasks()
                 self.win.update()
             self._display.remove_rules()
+            self._display.update_token_msg(0)
             self._display.place_token_label()
             # do game stuff
             while self._playing:
@@ -390,6 +391,7 @@ class GameController():
                 self.win.update_idletasks()
                 self.win.update()
 
+            self._display.remove_token_label()
             self._score_screen = True
             self._display.set_score_label(self.calc_score())
             self.set_high_score_label()

@@ -18,4 +18,9 @@ class Token(Element):
         self._bonus = bonus
 
     def interact(self, char: Character):
+        """Interacts with the given character by incrementing token attributes.
+
+        Args:
+            char (Character): The Character being interacted with.
+        """
         char.incr_tokens(self._bonus)

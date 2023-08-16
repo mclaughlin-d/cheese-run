@@ -60,25 +60,12 @@ class Element(ABC):
             return (
                 self.x_overlap(char.posn[0], char.dim[0]) and self.y_overlap(char.posn[1], char.dim[1])
             )
-
-    
-    def hit_bottom(self, char: Character) -> bool:
-        return (
-            (self.posn[0] <= char.posn[0] + char.dim[0] <= self.posn[0] + self.dim[0]) and
-            (char.posn[1] <= self.posn[1] + self.dim[1])
-        )
-
-    def hit_top(self, char: Character) -> bool:
-        return (
-            (self.posn[0] <= char.posn[0] + char.dim[0] <= self.posn[0] + self.dim[0]) and
-            (char.posn[1] + char.dim[1] <= self.posn[1] + 5)
-        )
     
     def update_posn(self) -> None:
         """Updates the elements position based on its velocity.
         """
         self.posn[0] += self._vel[0]
-        #self.posn[1] += self._vel[1]
+        self.posn[1] += self._vel[1]
 
     def set_vel(self, x_vel: int, y_vel: int) -> None:
         """Sets the velocity attribute based on the parameters passed.
@@ -99,8 +86,8 @@ class Element(ABC):
             bool: Whether or not their horizontal positions overlap
         """
         return (
-            self.posn[0] <= x <= self.posn[0] + self.dim[0] or
-            self.posn[0] <= x + width <= self.posn[0] + self.dim[0]
+            self.posn[0] <= x + width <= self.posn[0] + self.dim[0] or
+            self.posn[0] <= x + 70 <= self.posn[0] + self.dim[0]
         )
     
     def y_overlap(self, y, width) -> bool:
