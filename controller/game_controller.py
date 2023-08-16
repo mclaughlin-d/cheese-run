@@ -230,7 +230,7 @@ class GameController():
         # NOTE = may make more sense to mvoe some of these to player instead
         is_above = False
         for obst in self.obstacles:
-            if not (obst.type == 3):
+            if not obst.block:
                 if obst.is_above(self.player):
                     self.player.min_y = obst.posn[1] + obst.dim[1]
                 elif obst.is_below(self.player):
