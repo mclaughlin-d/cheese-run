@@ -63,6 +63,7 @@ class GameController():
         # sounds:
         self.token_sound = GameSound(GameSound.TOKEN_SOUND)
         self.jump_sound = GameSound(GameSound.JUMP_SOUND)
+        self.game_over_sound = GameSound(GameSound.GAME_OVER_SOUND)
 
         self.player = Player(
             100,
@@ -127,14 +128,6 @@ class GameController():
                     Obstacle.TYPE_2['path'],
                     True,
                     2
-                )
-            elif type == 3:
-                self.add_obstacle(
-                    [1500 + Obstacle.TYPE_3['dim'][0], 660 - Obstacle.TYPE_3['dim'][1]],
-                    Obstacle.TYPE_3['dim'],
-                    Obstacle.TYPE_3['path'],
-                    True,
-                    3
                 )
 
     def gen_token(self):
@@ -387,6 +380,7 @@ class GameController():
 
                 if self.player.check_hp() <= 0:
                     self._playing = False
+                    self.game_over_sound.play_async()
 
                 self.win.update_idletasks()
                 self.win.update()
