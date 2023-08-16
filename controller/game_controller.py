@@ -2,6 +2,8 @@ import random
 import time
 import tkinter as tk
 
+from typing import List
+
 from view.display import Display
 from model.player import Player
 from model.obstacle import Obstacle
@@ -17,7 +19,7 @@ class GameController():
     """
     SMALL_SIZE = None
     MED_SIZE = {
-        'board-width': 1200, # could change idk check background img size
+        'board-width': 1200, #
         'board-height': 700,
         'player-width': 180,
         'player-height': 72,
@@ -28,16 +30,14 @@ class GameController():
 
     sizes = [SMALL_SIZE, MED_SIZE, LARGE_SIZE]
 
-    REFRESH_INTERVAL = 0.008 # constant that controlls time interval between display updates
+    REFRESH_INTERVAL = 0.008 
 
     SCORES_PATH = 'assets/text/scores.txt'
 
     def __init__(self):
-        # create window: SHOULD THSI BE IN DISPLAY INSTEAD?
-
         self.win = tk.Tk()
         self.win.title("Cheese Run")
-        self.win.bind('<space>', self.handle_keypress) #bind keypress to window
+        self.win.bind('<space>', self.handle_space) #bind keypress to window
         self.win.bind('<Escape>', lambda e: self.win.destroy())
         self.win.bind('<Return>', self.write_score)
         self.win.bind('<Right>', self.restart_game)
@@ -63,13 +63,14 @@ class GameController():
         # sounds:
         self.token_sound = GameSound(GameSound.TOKEN_SOUND)
         self.jump_sound = GameSound(GameSound.JUMP_SOUND)
+        self.game_over_sound = GameSound(GameSound.GAME_OVER_SOUND)
 
         self.player = Player(
             100,
             20,
             5,
             ['assets/mouse_1_med.png', 'assets/mouse_2_med.png'],
-            [200, 592], # position, may need to adjust
+            [200, 592],
             [180, 78], 
             0,
             592,
@@ -78,8 +79,8 @@ class GameController():
     def determine_size(self) -> None:
         """Determines the sizes of the files/window based on the screen size.
         """
-        s_width = self._win.winfo_screenwidth
-        s_height = self._win.winfo_screenheight
+        s_width = self.win.winfo_screenwidth
+        s_height = self.win.winfo_screenheight
         
     def set_rules(self, rule_filepath: str) -> None:
         """Sets the rules label for the display.
@@ -103,6 +104,8 @@ class GameController():
 
 
     def update_rand_cieling(self) -> None:
+        """Decreases the random upper bound for element generation as the time played increases.
+        """
         self.random_cieling = int(self.random_cieling - (time.time() - self._start_time)/100)
         if self.random_cieling < 100:
             self.random_cieling = 100
@@ -137,7 +140,9 @@ class GameController():
                     3,
                 )
 
-    def gen_token(self):
+    def gen_token(self) -> None:
+        """Randomly generates tokens.
+        """
         if random.randint(1, 10000) < 20:
             y_pos = random.randint(50, 580 - Token.MED_TOKEN['dim'][1])
             self.add_token(
@@ -146,14 +151,23 @@ class GameController():
                 Token.MED_TOKEN['path']
             )
 
-    def add_token(self, pos, dim, path):
+    def add_token(self, pos: List[int], dim: List[int], path: str) -> None:
+        """Adds a token to the game with the specified position, dimensions, and file path.
+
+        Args:
+            pos (List[int]): The position of the token.
+            dim (List[int]): The dimensions of the token.
+            path (str): The file path to the token image.
+        """
         new_token = Token(pos, dim, path)
         self.tokens.append(new_token)
         self.tok_canv_objs.append(
             self._display.add_elt(new_token._imgpath, new_token.posn)
         )
 
-    def update_view(self):
+    def update_view(self) -> None:
+        """Moves all of the game elements according to their velocities.
+        """
         for obst, obst_obj in zip(self.obstacles, self.obst_canv_objs):
             self._display.move_elt(obst_obj, obst.posn)
         
@@ -161,10 +175,16 @@ class GameController():
             self._display.move_elt(tok_obj, tok.posn)
 
     def update_player_posn(self):
+        """Updates the position of the player.
+        """
         self._display.update_player(self.player.posn[0], self.player.posn[1])
 
-    def handle_keypress(self, key) -> None:
-       
+    def handle_space(self, key: str) -> None:
+        """Handles a spacebar press.
+
+        Args:
+            key (str): The key pressed, automatically passed by the tkinter event binding.
+        """
         if self._start_screen:
             self._start_screen = False
             self._score_screen = False
@@ -176,7 +196,12 @@ class GameController():
                 self.jump_sound.play_async()
                 self.player.set_state(Player.JUMP_STATE)
 
-    def restart_game(self, key) -> None:
+    def restart_game(self, key: str) -> None:
+        """Restarts the gameplay.
+
+        Args:
+            key (str): The key pressed, automatically passed by the tkinter event binding.
+        """
         self._score_screen = False
         self._start_screen = True
         self._display.remove_score_screen()
@@ -210,10 +235,19 @@ class GameController():
             tok.update_posn()
 
     def update_frames(self) -> None:
+        """Updates the currently displayed frame of the player.
+        """
         self.player.update_curr_frame()
 
-    def add_obstacle(self, pos, dim, path, block, type) -> None:
-        """Adds a new obstacle to the board. 
+    def add_obstacle(self, pos: List[int], dim: List[int], path: str, block: bool, type: int) -> None:
+        """Adds a new obstacle to the board and display.
+
+        Args:
+            pos (List[int]): The position of the obstacle.
+            dim (List[int]): The dimensions of the obstacle.
+            path (str): The file path of the obstacle image.
+            block (bool): The mode of the obstacle.
+            type (int): The type of the obstacle.
         """
         if len(self.obstacles) > 0:
             last_obst = self.obstacles[-1]
@@ -226,8 +260,9 @@ class GameController():
             self._display.add_elt(new_obstacle._imgpath, new_obstacle.posn)
         )
     
-    def player_collide(self):
-        # NOTE = may make more sense to mvoe some of these to player instead
+    def player_collide(self) -> None:
+        """Analyzes player interactions with obstacles on screen and manipulates accordingly.
+        """
         is_above = False
         for obst in self.obstacles:
             if not obst.block:
@@ -251,7 +286,9 @@ class GameController():
             self.player.vel = [0, 3]
             self.player.fall()
 
-    def player_collect(self):
+    def player_collect(self) -> None:
+        """Collects tokens the player interacts with.
+        """
         tokens_to_del = []
         tok_canv_objs_to_del = []
         for i in range(len(self.tokens)):
@@ -269,6 +306,8 @@ class GameController():
             self.tok_canv_objs.remove(obj)
 
     def remove_elts(self):
+        """Removes elements that have gone off the screen
+        """
         obst_to_remove = []
         obst_obj_to_remove = []
         for i in range(len(self.obstacles)):
@@ -293,14 +332,24 @@ class GameController():
             self.tokens.remove(tok)
             self.tok_canv_objs.remove(tok_obj)
 
-    def calc_score(self):
+    def calc_score(self) -> int:
+        """Calculates and returns the score.
+
+        Returns:
+            int: The score the player earned during the most recent run.
+        """
         time_factor = int(time.time() - self._start_time)
         print("TIME FACTOR: ", time_factor)
         print("RAN CEILING: ", self.random_cieling)
         token_factor = self.player.tokens
         return time_factor * 10 + token_factor
 
-    def write_score(self, key):
+    def write_score(self, key: str) -> None:
+        """Writes the score to the 'scores.txt' file.
+
+        Args:
+            key (str): The key pressed, automaticallly passed by tkinter event binding.
+        """
         score = self.calc_score()
         name = self.get_name()
         try:
@@ -312,6 +361,12 @@ class GameController():
             return
         
     def get_high_score(self) -> str:
+        """Gets the highest score in 'scores.txt' and returns it and the name of the player.
+
+        Returns:
+            str: the name
+            int: the score
+        """
         high_score = 0
         high_name = 'anonymous'
         try:
@@ -333,22 +388,23 @@ class GameController():
         
         return high_name, high_score
     
-    def set_high_score_label(self):
+    def set_high_score_label(self) -> None:
+        """Sets the high score label in display.
+        """
         name, score = self.get_high_score()
         self._display.set_high_score_label(f"The high score:\n{name}: {score}")
 
-    def get_name(self):
+    def get_name(self) -> str:
+        """Gets the name entered by the player when submitting score.
+
+        Returns:
+            str: The name from the display.
+        """
         return self._display.get_score_name()
 
     def run_game(self) -> None:
-        # starting stuff
-        # grab screen size
-        # determine window sizes and all that - ORand pass to game object do this elsewhere 
-        # change objects as needed
-
-        # set start time
-
-        # intro screen stuff
+        """Runs the main gameplay
+        """
         
         while self._running:
             self.random_cieling = 10000
@@ -394,6 +450,7 @@ class GameController():
 
                 if self.player.check_hp() <= 0:
                     self._playing = False
+                    self.game_over_sound.play_async()
 
                 self.win.update_idletasks()
                 self.win.update()
