@@ -111,13 +111,13 @@ class GameController():
         """Uses the length of game play to randomly determine obstacle generation
         """
         if random.randint(1, self.random_cieling) < 20:
-            type = random.randint(1, 2)
+            type = random.randint(1, 3)
             if type == 1:
                 self.add_obstacle(
                     [1500 + Obstacle.TYPE_1['dim'][0], 660 - Obstacle.TYPE_1['dim'][1]],
                     Obstacle.TYPE_1['dim'],
                     Obstacle.TYPE_1['path'],
-                    True,
+                    False,
                     1
                 )
             elif type == 2:
@@ -125,7 +125,7 @@ class GameController():
                     [1500 + Obstacle.TYPE_2['dim'][0],660 - Obstacle.TYPE_2['dim'][1]],
                     Obstacle.TYPE_2['dim'],
                     Obstacle.TYPE_2['path'],
-                    True,
+                    False,
                     2
                 )
             elif type == 3:
@@ -134,7 +134,7 @@ class GameController():
                     Obstacle.TYPE_3['dim'],
                     Obstacle.TYPE_3['path'],
                     True,
-                    3
+                    3,
                 )
 
     def gen_token(self):
@@ -230,13 +230,19 @@ class GameController():
         # NOTE = may make more sense to mvoe some of these to player instead
         is_above = False
         for obst in self.obstacles:
-            if obst.is_above(self.player):
-                self.player.min_y = obst.posn[1] + obst.dim[1]
-            elif obst.is_below(self.player):
-                self.player.ground = obst.posn[1] - self.player.dim[1]
-                is_above = True
-            elif obst.collided(self.player):
-                obst.interact(self.player)
+            if not obst.block:
+                if obst.is_above(self.player):
+                    self.player.min_y = obst.posn[1] + obst.dim[1]
+                elif obst.is_below(self.player):
+                    self.player.ground = obst.posn[1] - self.player.dim[1]
+                    is_above = True
+                elif obst.collided(self.player):
+                    obst.interact(self.player)
+            else:
+                print("SPIKE!")
+                if obst.collided(self.player):
+                    print("OBST COLLIDED")
+                    obst.interact(self.player)
 
         if (not is_above) and self.player.ground != 592:
             self.player.set_state(Player.FALL_STATE)
