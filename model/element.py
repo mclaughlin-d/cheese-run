@@ -11,7 +11,7 @@ class Element(ABC):
         self.posn = posn
         self.dim = dim
         self._imgpath = imgpath
-        self._vel = [-5, 0]
+        self._vel = [-6, 0]
 
     @abstractmethod
     def interact(self):
