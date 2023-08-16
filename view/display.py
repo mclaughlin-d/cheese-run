@@ -22,14 +22,14 @@ class Display():
         self.token_label = tk.Label(self.win, font='arial', text=self.token_text, anchor='nw')
         
         self.rules_text = ""
-        self.rules_label = tk.Label(self.win, font='arial', text=self.rules_text, anchor=tk.CENTER)
+        self.rules_label = tk.Label(self.win, font='arial', text=self.rules_text, anchor=tk.N)
 
         self.score_text = "Your score was: "
         self.score_label = tk.Label(self.win, font='arial', text=self.score_text, anchor='nw')
 
         self.high_score_text = ""
-        self.high_score_label = tk.Label(self.win, font='arial', text = self.rules_text, anchor = tk.CENTER)
-        self.name_label = tk.Label(self.win, text="Type your name and press 'enter' to submit your score.\nPress the right arrow key to restart the game, or 'esc' to exit.\n", font='arial')
+        self.high_score_label = tk.Label(self.win, font='arial', text = self.rules_text, anchor = tk.N)
+        self.name_label = tk.Label(self.win, text="Type your name and press 'enter' to submit your score.\nPress the right arrow key to restart the game, or 'esc' to exit.\n", font='arial', bg='white')
         self.name_entry = tk.Entry(self.win, width=40)
 
         self.canvas.pack()
@@ -41,6 +41,7 @@ class Display():
         self.OBST_1_MED_IMG = tk.PhotoImage(file='assets/obst_1_med.png')
         self.OBST_2_MED_IMG = tk.PhotoImage(file='assets/obst_2_med.png')
         self.OBST_3_MED_IMG = tk.PhotoImage(file='assets/obst_3_med.png')
+        self.TITLE_IMG = tk.PhotoImage(file='assets/title_med.png')
 
     def add_elt(self, path: str, pos: List[int]) -> int:
         """Adds an element to the display.
@@ -73,8 +74,8 @@ class Display():
             rules (str): The rules to be displayed.
         """
         self.rules_text = rules
-        self.rules_label.config(text = self.rules_text)
-        self.rules_label.place(x=30, y=50)
+        self.rules_label.config(text = self.rules_text, image=self.TITLE_IMG, compound='top', bg='white', anchor=tk.N)
+        self.rules_label.place(x=485, y=60)
 
     def remove_rules(self) -> None:
         """Removes the rules label from the screen.
@@ -135,7 +136,7 @@ class Display():
             num_collected (int): The number of tokens currently collected.
         """
         self.token_text = "Tokens Collected: " + str(num_collected)
-        self.token_label.config(text = self.token_text)
+        self.token_label.config(text = self.token_text, bg='white')
 
     def get_score_name(self) -> str:
         """Gets the name entered by the user corresponding to the latest run.
@@ -158,7 +159,7 @@ class Display():
             score (int): The score to be displayed on the label.
         """
         self.score_text = "Your score was: " + str(score)
-        self.score_label.config(text = self.score_text)
+        self.score_label.config(text = self.score_text, bg='white')
 
     def set_high_score_label(self, text: str) -> None:
         """Sets the high score label value.
@@ -167,7 +168,7 @@ class Display():
             text (str): The text to be displayed for the high score.
         """
         self.high_score_text = text
-        self.high_score_label.config(text = self.high_score_text)
+        self.high_score_label.config(text = self.high_score_text, bg='white')
 
     def create_score_screen(self) -> None:
         """Creates the score screen by placing the right elements.

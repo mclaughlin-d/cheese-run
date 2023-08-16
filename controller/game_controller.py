@@ -64,8 +64,6 @@ class GameController():
         self.token_sound = GameSound(GameSound.TOKEN_SOUND)
         self.jump_sound = GameSound(GameSound.JUMP_SOUND)
 
-        self.elt_vel = [-5, 0]
-
         self.player = Player(
             100,
             20,
@@ -223,14 +221,10 @@ class GameController():
                 return
             
         new_obstacle = Obstacle(pos, dim, path, block, type)# add parameters later!
-        new_obstacle.vel = self.elt_vel
         self.obstacles.append(new_obstacle)
         self.obst_canv_objs.append(
             self._display.add_elt(new_obstacle._imgpath, new_obstacle.posn)
         )
-
-    def update_elt_vel(self) -> None:
-        self.elt_vel = [-1 * int(5 + 2*(time.time() - self._start_time)), 0]
     
     def player_collide(self):
         # NOTE = may make more sense to mvoe some of these to player instead
@@ -294,6 +288,8 @@ class GameController():
 
     def calc_score(self):
         time_factor = int(time.time() - self._start_time)
+        print("TIME FACTOR: ", time_factor)
+        print("RAN CEILING: ", self.random_cieling)
         token_factor = self.player.tokens
         return time_factor * 10 + token_factor
 
