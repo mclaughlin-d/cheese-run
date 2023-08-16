@@ -33,8 +33,5 @@ class Obstacle(Element):
         Args:
             char (Character): The character to modify.
         """
-        if self.block:
-            char.set_hp(0)
-        else:
-            char.update_hp(self._damage * -1)
+        char.set_hp(0)
         

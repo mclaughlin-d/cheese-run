@@ -230,18 +230,19 @@ class GameController():
         # NOTE = may make more sense to mvoe some of these to player instead
         is_above = False
         for obst in self.obstacles:
-            if not obst.block:
+            if not (obst.type == 3):
                 if obst.is_above(self.player):
                     self.player.min_y = obst.posn[1] + obst.dim[1]
                 elif obst.is_below(self.player):
                     self.player.ground = obst.posn[1] - self.player.dim[1]
                     is_above = True
                 elif obst.collided(self.player):
+                    print("OBST COLLIDED")
                     obst.interact(self.player)
             else:
                 print("SPIKE!")
                 if obst.collided(self.player):
-                    print("OBST COLLIDED")
+                    print("SPIKE COLLIDED")
                     obst.interact(self.player)
 
         if (not is_above) and self.player.ground != 592:
