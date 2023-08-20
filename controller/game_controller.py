@@ -419,67 +419,77 @@ class GameController():
         """
         return self._display.get_score_name()
 
+    def start_screen(self):
+        self._start_screen = True
+        self.random_cieling = 10000
+        self.set_rules('assets/text/rules.txt')
+        self._start_time = time.time()
+        self._last_refresh = self._start_time
+        self._last_player_refresh = self._start_time
+
+        while self._start_screen:
+            self.win.update_idletasks()
+            self.win.update()
+
+    def playing(self):
+        self._display.remove_rules()
+        self._display.update_token_msg(0)
+        self._display.place_token_label()
+        # do game stuff
+        while self._playing:
+        # refresh the view every 0.005 seconds
+            if time.time() - self._last_refresh >= GameController.REFRESH_INTERVAL:
+                # randomly generate new obstacles and tokens
+                self.gen_obstacle()
+                self.gen_token()
+
+                self.update_posns()
+                self.player_collide()
+                self.player_collect()
+                self.remove_elts()
+                self.update_view()
+
+                if self.player.state == Player.JUMP_STATE:
+                    self.player.jump()
+                    self._display.update_player(self.player.posn)
+                elif self.player.state == Player.FALL_STATE:
+                    self.player.fall()
+                    self._display.update_player(self.player.posn)
+
+                self._last_refresh = time.time()
+                self.update_rand_cieling()
+
+            if time.time() - self._last_player_refresh >= Player.WALK_INTERVAL:
+                self.player.update_curr_frame()
+                self._display.update_player_frame(self.player.get_curr_frame(), self.player.posn)
+                self._last_player_refresh = time.time()
+                
+
+            if self.player.check_hp() <= 0:
+                self._playing = False
+                self.game_over_sound.play_async()
+
+            self.win.update_idletasks()
+            self.win.update()
+
+    def score_screen(self):
+        self._display.remove_token_label()
+        self._score_screen = True
+        self._display.set_score_label(self.calc_score())
+        self.set_high_score_label()
+        self._display.create_score_screen()
+
+        while self._score_screen:
+            self.win.update_idletasks()
+            self.win.update()
+
     def run_game(self) -> None:
         """Runs the main gameplay
         """
         
         while self._running:
-            self.random_cieling = 10000
-            self.set_rules('assets/text/rules.txt')
-            self._start_time = time.time()
-            self._last_refresh = self._start_time
-            self._last_player_refresh = self._start_time
-            while self._start_screen:
-                self.win.update_idletasks()
-                self.win.update()
-            self._display.remove_rules()
-            self._display.update_token_msg(0)
-            self._display.place_token_label()
-            # do game stuff
-            while self._playing:
-            # refresh the view every 0.005 seconds
-                if time.time() - self._last_refresh >= GameController.REFRESH_INTERVAL:
-                    # randomly generate new obstacles and tokens
-                    self.gen_obstacle()
-                    self.gen_token()
+            self.start_screen()
 
-                    self.update_posns()
-                    self.player_collide()
-                    self.player_collect()
-                    self.remove_elts()
-                    self.update_view()
+            self.playing()
 
-                    if self.player.state == Player.JUMP_STATE:
-                        self.player.jump()
-                        self._display.update_player(self.player.posn)
-                    elif self.player.state == Player.FALL_STATE:
-                        self.player.fall()
-                        self._display.update_player(self.player.posn)
-
-                    self._last_refresh = time.time()
-                    self.update_rand_cieling()
-
-                if time.time() - self._last_player_refresh >= Player.WALK_INTERVAL:
-                    self.player.update_curr_frame()
-                    self._display.update_player_frame(self.player.get_curr_frame(), self.player.posn)
-                    self._last_player_refresh = time.time()
-                    
-
-                if self.player.check_hp() <= 0:
-                    self._playing = False
-                    self.game_over_sound.play_async()
-
-                self.win.update_idletasks()
-                self.win.update()
-
-            self._display.remove_token_label()
-            self._score_screen = True
-            self._display.set_score_label(self.calc_score())
-            self.set_high_score_label()
-            self._display.create_score_screen()
-            
-            while self._score_screen:
-                self.win.update_idletasks()
-                self.win.update()
-            
-            self._start_screen = True
+            self.score_screen()
