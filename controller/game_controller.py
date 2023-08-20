@@ -420,6 +420,8 @@ class GameController():
         return self._display.get_score_name()
 
     def start_screen(self):
+        """Runs the start screen of the game.
+        """
         self._start_screen = True
         self.random_cieling = 10000
         self.set_rules('assets/text/rules.txt')
@@ -432,9 +434,12 @@ class GameController():
             self.win.update()
 
     def playing(self):
+        """Runs the main gameplay loop.
+        """
         self._display.remove_rules()
         self._display.update_token_msg(0)
         self._display.place_token_label()
+        
         # do game stuff
         while self._playing:
         # refresh the view every 0.005 seconds
@@ -443,12 +448,14 @@ class GameController():
                 self.gen_obstacle()
                 self.gen_token()
 
+                # update positions from last cycle, then check for collisions
                 self.update_posns()
                 self.player_collide()
                 self.player_collect()
                 self.remove_elts()
                 self.update_view()
 
+                # perform appropriate player actions if necessary. 
                 if self.player.state == Player.JUMP_STATE:
                     self.player.jump()
                     self._display.update_player(self.player.posn)
@@ -459,20 +466,24 @@ class GameController():
                 self._last_refresh = time.time()
                 self.update_rand_cieling()
 
+            # update player frames
             if time.time() - self._last_player_refresh >= Player.WALK_INTERVAL:
                 self.player.update_curr_frame()
                 self._display.update_player_frame(self.player.get_curr_frame(), self.player.posn)
                 self._last_player_refresh = time.time()
                 
-
+            # check player HP
             if self.player.check_hp() <= 0:
                 self._playing = False
                 self.game_over_sound.play_async()
 
+            # update tkinter display
             self.win.update_idletasks()
             self.win.update()
 
     def score_screen(self):
+        """Runs the score screen of the game.
+        """
         self._display.remove_token_label()
         self._score_screen = True
         self._display.set_score_label(self.calc_score())
@@ -488,8 +499,9 @@ class GameController():
         """
         
         while self._running:
+            # runs the start screen
             self.start_screen()
-
+            # runs the main playing loop
             self.playing()
-
+            # runs the score screen loop
             self.score_screen()
