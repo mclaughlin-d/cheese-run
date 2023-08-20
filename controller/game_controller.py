@@ -19,29 +19,43 @@ class GameController():
     """
     SMALL_SIZE = None
     MED_SIZE = {
-        'board-width': 1200, #
-        'board-height': 700,
-        'player-width': 180,
-        'player-height': 72,
-        'player-frames': ['../assets/mouse_1_med.png', '../assets/mouse_2_med.png'],
-
+        'board-width': 1500, 
+        'board-height': 750,
+        'player-dim': [180, 72],
+        'player-posn': [200, 592],
+        'player-frames': ['assets/mouse_1_med.png', 'assets/mouse_2_med.png'],
+        'bg-file': 'assets/background_med.png',
+        'ground-file' : 'assets/ground_med.png',
+        'max-y': 660
     }
     LARGE_SIZE = None
-
-    sizes = [SMALL_SIZE, MED_SIZE, LARGE_SIZE]
 
     REFRESH_INTERVAL = 0.008 
 
     SCORES_PATH = 'assets/text/scores.txt'
 
     def __init__(self):
+        # create window
         self.win = tk.Tk()
         self.win.title("Cheese Run")
-        self.win.bind('<space>', self.handle_space) #bind keypress to window
+        # bind appropriate keys
+        self.win.bind('<space>', self.handle_space)
         self.win.bind('<Escape>', lambda e: self.win.destroy())
         self.win.bind('<Return>', self.write_score)
         self.win.bind('<Right>', self.restart_game)
-        self._display = Display(self.win, 'assets/background_med.png', 'assets/ground_med.png', 1500, 750, 'assets/mouse_1_med.png', [200,592])
+        # get appropriate dimensions/assets for size of screen
+        self.size_assets = self.determine_size()
+
+        # initialize display object
+        self._display = Display(
+            self.win, 
+            self.size_assets['bg-file'], 
+            self.size_assets['ground-file'], 
+            self.size_assets['board-width'], 
+            self.size_assets['board-height'], 
+            self.size_assets['player-frames'][0], 
+            self.size_assets['player-posn']
+        )
 
         self._playing = False
         self._start_screen = True
@@ -69,18 +83,21 @@ class GameController():
             100,
             20,
             5,
-            ['assets/mouse_1_med.png', 'assets/mouse_2_med.png'],
-            [200, 592],
-            [180, 78], 
+            self.size_assets['player-frames'],
+            self.size_assets['player-posn'],
+            self.size_assets['player-dim'], 
             0,
-            592,
+            self.size_assets['player-posn'][0]
         )
 
-    def determine_size(self) -> None:
+    def determine_size(self) -> dict:
         """Determines the sizes of the files/window based on the screen size.
         """
+        # feature under development
         s_width = self.win.winfo_screenwidth
         s_height = self.win.winfo_screenheight
+        # defaults to 'medium size' version
+        return GameController.MED_SIZE
         
     def set_rules(self, rule_filepath: str) -> None:
         """Sets the rules label for the display.
@@ -117,7 +134,7 @@ class GameController():
             type = random.randint(1, 3)
             if type == 1:
                 self.add_obstacle(
-                    [1500 + Obstacle.TYPE_1['dim'][0], 660 - Obstacle.TYPE_1['dim'][1]],
+                    [self.size_assets['board-width'] + Obstacle.TYPE_1['dim'][0], self.size_assets['max-y'] - Obstacle.TYPE_1['dim'][1]],
                     Obstacle.TYPE_1['dim'],
                     Obstacle.TYPE_1['path'],
                     False,
@@ -125,7 +142,7 @@ class GameController():
                 )
             elif type == 2:
                 self.add_obstacle(
-                    [1500 + Obstacle.TYPE_2['dim'][0],660 - Obstacle.TYPE_2['dim'][1]],
+                    [self.size_assets['board-width'] + Obstacle.TYPE_2['dim'][0], self.size_assets['max-y'] - Obstacle.TYPE_2['dim'][1]],
                     Obstacle.TYPE_2['dim'],
                     Obstacle.TYPE_2['path'],
                     False,
@@ -133,7 +150,7 @@ class GameController():
                 )
             elif type == 3:
                 self.add_obstacle(
-                    [1500 + Obstacle.TYPE_3['dim'][0], 660 - Obstacle.TYPE_3['dim'][1]],
+                    [self.size_assets['board-width'] + Obstacle.TYPE_3['dim'][0], self.size_assets['max-y'] - Obstacle.TYPE_3['dim'][1]],
                     Obstacle.TYPE_3['dim'],
                     Obstacle.TYPE_3['path'],
                     True,
@@ -144,9 +161,9 @@ class GameController():
         """Randomly generates tokens.
         """
         if random.randint(1, 10000) < 20:
-            y_pos = random.randint(50, 580 - Token.MED_TOKEN['dim'][1])
+            y_pos = random.randint(50, self.size_assets['max-y'] - 80 - Token.MED_TOKEN['dim'][1])
             self.add_token(
-                [1500 + Token.MED_TOKEN['dim'][0], y_pos],
+                [self.size_assets['board-width'] + Token.MED_TOKEN['dim'][0], y_pos],
                 Token.MED_TOKEN['dim'],
                 Token.MED_TOKEN['path']
             )
@@ -209,11 +226,11 @@ class GameController():
             100,
             20,
             5,
-            ['assets/mouse_1_med.png', 'assets/mouse_2_med.png'],
-            [200, 592], # position, may need to adjust
-            [180, 78], 
+            self.size_assets['player-frames'],
+            self.size_assets['player-posn'],
+            self.size_assets['player-dim'], 
             0,
-            592,
+            self.size_assets['player-posn'][0]
         )
 
         for obj in self.obst_canv_objs:
@@ -460,6 +477,7 @@ class GameController():
             self._display.set_score_label(self.calc_score())
             self.set_high_score_label()
             self._display.create_score_screen()
+            
             while self._score_screen:
                 self.win.update_idletasks()
                 self.win.update()
