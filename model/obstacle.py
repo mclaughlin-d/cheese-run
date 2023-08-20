@@ -16,10 +16,14 @@ class Obstacle(Element):
         'path': 'assets/obst_2_med.png',
         'dim': [204, 162]
     }
+    TYPE_3 = {
+        'path': 'assets/obst_3_med.png',
+        'dim': [42, 51]
+    }
 
     def __init__(self, pos: tuple, dim: tuple, imgpath: str, block: bool, type: int, damage: int = 0) -> None:
         super().__init__(pos, dim, imgpath)
-        self._block = block
+        self.block = block
         self._damage = damage
         self.type = type
 
@@ -29,8 +33,5 @@ class Obstacle(Element):
         Args:
             char (Character): The character to modify.
         """
-        if self._block:
-            char.set_hp(0)
-        else:
-            char.update_hp(self._damage * -1)
+        char.set_hp(0)
         
