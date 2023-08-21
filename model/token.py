@@ -1,6 +1,5 @@
 from model.element import Element
 from model.character import Character
-from model.gamesound import GameSound
 
 class Token(Element):
     """Represents a token the player can collect.
