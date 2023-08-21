@@ -8,7 +8,7 @@ from view.display import Display
 from model.player import Player
 from model.obstacle import Obstacle
 from model.token import Token
-from model.sound import GameSound
+from model.gamesound import GameSound
 
 
 class GameController():
@@ -289,12 +289,9 @@ class GameController():
                     self.player.ground = obst.posn[1] - self.player.dim[1]
                     is_above = True
                 elif obst.collided(self.player):
-                    print("OBST COLLIDED")
                     obst.interact(self.player)
             else:
-                print("SPIKE!")
                 if obst.collided(self.player):
-                    print("SPIKE COLLIDED")
                     obst.interact(self.player)
 
         if (not is_above) and self.player.ground != 592:
@@ -356,8 +353,6 @@ class GameController():
             int: The score the player earned during the most recent run.
         """
         time_factor = int(time.time() - self._start_time)
-        print("TIME FACTOR: ", time_factor)
-        print("RAN CEILING: ", self.random_cieling)
         token_factor = self.player.tokens
         return time_factor * 10 + token_factor
 
@@ -505,3 +500,7 @@ class GameController():
             self.playing()
             # runs the score screen loop
             self.score_screen()
+
+def main():
+    game_controller = GameController()
+    game_controller.run_game()

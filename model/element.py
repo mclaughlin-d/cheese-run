@@ -85,16 +85,10 @@ class Element(ABC):
         Returns:
             bool: Whether or not their horizontal positions overlap
         """
-        overlap = (
+        return (
             self.posn[0] <= x + width <= self.posn[0] + self.dim[0] or
             self.posn[0] <= x + 70 <= self.posn[0] + self.dim[0]
         )
-        # print("X: ", overlap)
-        return overlap
-        # return (
-        #     self.posn[0] <= x + width <= self.posn[0] + self.dim[0] or
-        #     self.posn[0] <= x + 70 <= self.posn[0] + self.dim[0]
-        # )
     
     def y_overlap(self, y, width) -> bool:
         """Determines whether the character's and obstacle's vertical positions overlap.
@@ -105,12 +99,6 @@ class Element(ABC):
         Returns:
             bool: Whether or not their vertical positions overlap
         """
-        overlap = (
-            self.posn[1] <= y <= self.posn[1] + self.dim[1] or
-            self.posn[1] <= y + width <= self.posn[1] + self.dim[1] or
-            y <= self.posn[1] <= y + width
-        )
-        print("Y: ", overlap)
         return (
             self.posn[1] <= y <= self.posn[1] + self.dim[1] or
             self.posn[1] <= y + width <= self.posn[1] + self.dim[1] or
