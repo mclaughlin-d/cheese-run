@@ -34,9 +34,6 @@ class Display():
 
         self.canvas.pack()
 
-
-        # may be easier and faster to store in a dict with the filepaths as keys or smth
-
         self.TOKEN_MED_IMG = tk.PhotoImage(file='assets/cheese_med.png')
         self.OBST_1_MED_IMG = tk.PhotoImage(file='assets/obst_1_med.png')
         self.OBST_2_MED_IMG = tk.PhotoImage(file='assets/obst_2_med.png')

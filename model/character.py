@@ -12,7 +12,7 @@ class Character():
         self._curr_frame_index = 0
         self.posn = posn
         self.dim = dim
-        self.tokens = tokens # should change to token_bonus or smth
+        self.tokens = tokens 
         self.num_tokens = 0
 
     def update_hp(self, hp_delta: int) -> None:
