@@ -9,7 +9,7 @@ There is one level that increases in difficulty the longer it is played. To move
 If you have VS Code and you download the repository, all you need to do is run the game.py file in the cheese-run directory.
 
 ### Using the setup.py file
-You can use the setup.py file to build the project package and execute it with the 'cheese-run-cli' command. In summary, you activate a virtual python environment with venv, navigate to the cheese-run directory on your machine, and type 'pip install .', which will build the project. Then you can execute the command. If you are missing the playsound module, you will need to import it with 'pip install playsound'. 
+You can use the setup.py file to build the project package and execute it with the 'cheese-run-cli' command. In summary, you activate a virtual python environment with venv, navigate to the cheese-run directory on your machine, and type 'pip install .', which will build the project. Then you can execute the command. If you are missing the playsound module, you will need to install it with 'pip install playsound'. 
 
 ## Libraries/Imports
 The only non-standard library import used in this project was the playsound module, which can be installed by running
