@@ -1,4 +1,5 @@
 # cheese-run
+![Alt text](/assets/title_med.png?raw=true "Title")  
 A simple python game where you play as a mouse collecting cheese.
 
 ## Basic Gameplay
